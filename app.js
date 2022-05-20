@@ -16,18 +16,18 @@ ctx.width = canvas.width
 ctx.height = canvas.height
 let truck
 let smallFrog, mediumFrog, largeFrog
-let lane1, lane2, lane3, lane4, lane5, lane6, lane7, lane8
+// let lane1, lane2, lane3, lane4, lane5, lane6, lane7, lane8
 
 
 
 class Object {
-    constructor(x, y, color, width, height) {
+    constructor(x, y, zIndex, color, width, height) {
         this.x = x
         this.y = y
+        this.zindex = zIndex
         this.color = color
         this.width = width
         this.height = height
-        this.alive = true
     }
     renderObject() {
         ctx.fillStyle = this.color
@@ -40,27 +40,60 @@ class Object {
 }
 
 //to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
-truck = new Object(canvas.width/2 -25, canvas.height -140, 'red', 50, 100)
+truck = new Object(canvas.width / 2 - 25, canvas.height - 140, 10, 'red', 50, 100)
 
+const drawTruck = () => {
+    truck.clearObject()
+    truck.renderObject()
+}
 const makeLanes = () => {
     const lanes = [
-    lane1 = new Object(100, 0, 'yellow', 4, 900),
-    lane2 = new Object(200, 0, 'yellow', 4, 900),
-    lane3 = new Object(300, 0, 'yellow', 4, 900),
-    lane4 = new Object(400, 0, 'yellow', 4, 900),
-    lane5 = new Object(500, 0, 'yellow', 4, 900),
-    lane6 = new Object(600, 0, 'yellow', 4, 900),
-    lane7 = new Object(700, 0, 'yellow', 4, 900),
-    lane8 = new Object(800, 0, 'yellow', 4, 900)
+        lane1 = new Object(100, 0, 0, 'white', 4, 900),
+        lane2 = new Object(200, 0, 0, 'white', 4, 900),
+        lane3 = new Object(300, 0, 0, 'white', 4, 900),
+        lane4 = new Object(400, 0, 0, 'white', 4, 900),
+        lane5 = new Object(500, 0, 0, 'white', 4, 900),
+        lane6 = new Object(600, 0, 0, 'white', 4, 900),
+        lane7 = new Object(700, 0, 0, 'white', 4, 900),
+        lane8 = new Object(800, 0, 0, 'white', 4, 900)
     ]
     lanes.forEach(lane => {
         lane.renderObject()
     })
 }
 
-startBtn.addEventListener('click', (e)=> {
-    truck.renderObject()
+const makeLaneDashes = () => {
+    //create array of staggered dashes across entire width
+    const laneDashesArr = [
+        laneDash1 = new Object(50, -50, 0, 'yellow', 2, 50),
+        laneDash2 = new Object(150, -100, 0,'yellow', 2, 50),
+        laneDash3 = new Object(250, -50, 0, 'yellow', 2, 50),
+        laneDash4 = new Object(350, -100, 0, 'yellow', 2, 50),
+        laneDash5 = new Object(450, -50, 0, 'yellow', 2, 50),
+        laneDash6 = new Object(550, -100, 0, 'yellow', 2, 50),
+        laneDash7 = new Object(650, -50, 0, 'yellow', 2, 50),
+        laneDash8 = new Object(750, -100, 0, 'yellow', 2, 50),
+        laneDash9 = new Object(850, -50, 0, 'yellow', 2, 50)
+    ]
+    laneDashesArr.forEach(dash => {
+        setInterval(() => {
+            dash.clearObject()
+            dash.y > 900 ? null : dash.y += 50
+            dash.renderObject()
+        }, 300)
+    })
+
+
+}
+
+//make the 'dashed lines in middle of lanes come down:
+//create the line in middle of lanes. setInterval for them to be made ever x amount of time
+//set interval to change the y coordinates every x amount of time
+
+startBtn.addEventListener('click', (e) => {
+    setInterval(drawTruck, 1)
     makeLanes()
+    setInterval(makeLaneDashes, 900)
 })
 
 
@@ -72,7 +105,7 @@ startBtn.addEventListener('click', (e)=> {
 const moveTruck = (e) => {
     //immediately clear out the 'old' truck
     truck.clearObject()
-    switch(e.key) {
+    switch (e.key) {
         case 'ArrowRight':
             truck.x < 825 ? truck.x += 100 : null
             break

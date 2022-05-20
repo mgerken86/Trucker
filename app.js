@@ -15,9 +15,10 @@ const startBtn = document.getElementById('start-btn')
 ctx.width = canvas.width
 ctx.height = canvas.height
 let truck
-let smallFrog
-let mediumFrog
-let largeFrog
+let smallFrog, mediumFrog, largeFrog
+let lane1, lane2, lane3, lane4, lane5, lane6, lane7, lane8
+
+
 
 class Object {
     constructor(x, y, color, width, height) {
@@ -38,11 +39,28 @@ class Object {
 
 }
 
-//to position truck in center of x axis, I divided the canvas in half and then subtacted half the truck's width
+//to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
 truck = new Object(canvas.width/2 -25, canvas.height -140, 'red', 50, 100)
+
+const makeLanes = () => {
+    const lanes = [
+    lane1 = new Object(100, 0, 'yellow', 4, 900),
+    lane2 = new Object(200, 0, 'yellow', 4, 900),
+    lane3 = new Object(300, 0, 'yellow', 4, 900),
+    lane4 = new Object(400, 0, 'yellow', 4, 900),
+    lane5 = new Object(500, 0, 'yellow', 4, 900),
+    lane6 = new Object(600, 0, 'yellow', 4, 900),
+    lane7 = new Object(700, 0, 'yellow', 4, 900),
+    lane8 = new Object(800, 0, 'yellow', 4, 900)
+    ]
+    lanes.forEach(lane => {
+        lane.renderObject()
+    })
+}
 
 startBtn.addEventListener('click', (e)=> {
     truck.renderObject()
+    makeLanes()
 })
 
 
@@ -56,11 +74,11 @@ const moveTruck = (e) => {
     truck.clearObject()
     switch(e.key) {
         case 'ArrowRight':
-            truck.x < 825 ? truck.x += 50 : null
+            truck.x < 825 ? truck.x += 100 : null
             break
         case 'ArrowLeft':
             //chose 25 because that's the closest it gets to the left border
-            truck.x > 25 ? truck.x -= 50 : null
+            truck.x > 25 ? truck.x -= 100 : null
     }
     //render truck with new coordinates
     truck.renderObject()

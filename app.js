@@ -16,7 +16,8 @@ window.onload = (e) => {
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
 const startBtn = document.getElementById('start-btn')
-//this is where all made frogs go
+//this is where all intervals go to clear them all at once
+let intervals = []
 let frogArr = []
 //this is to set and clear interval for making frogs
 let frogTimer
@@ -117,10 +118,42 @@ const makeFrog = () => {
     frogArr.forEach(frog => {
         frogFall = setInterval(() => {
             frog.clearObject()
-            frog.y > 900 ? null : frog.y += 25
+            frog.y > 800 ? null : frog.y += 3
             frog.renderObject()
             detectHit(truck, frog)
-        }, 400)
+        }, 50)
+        intervals.push(frogFall)
+        //following condition keeps arrays/frogs from getting too many and slowing things down
+        if (frog.y > 800) {
+            frogArr.shift()
+            intervals.shift()
+            frog.clearObject()
+        }
+    })
+}
+
+const makeGoldenFrog = () => {
+    possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
+    randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
+    //frog with random x axis
+    goldFrog = new Object(possibleLaneArray[randomIndex] -25, -100, ctx, 'yellow', 50, 40)
+    //push frog object into array
+    frogArr.push(frog)
+    //each frog in array gets an interval to have it 'rain' down. 
+    frogArr.forEach(frog => {
+        frogFall = setInterval(() => {
+            frog.clearObject()
+            frog.y > 800 ? null : frog.y += 3
+            frog.renderObject()
+            detectHit(truck, frog)
+        }, 50)
+        intervals.push(frogFall)
+        //following condition keeps arrays/frogs from getting too many and slowing things down
+        if (frog.y > 800) {
+            frogArr.shift()
+            intervals.shift()
+            frog.clearObject()
+        }
     })
 }
 
@@ -153,14 +186,16 @@ const moveTruck = (e) => {
 }
 
 const resetGame = () => {
+    alert('You lose!')
     clearInterval(frogTimer)
-    clearInterval(frogFall)
-    // frogArr.forEach(frog => {
-    //     clearInterval(frogFall)
-    //     frog.clearObject()
-    // })
+    //this removes the interval from every displayed frog. It stops them from raining down and re-rendering
+    intervals.forEach(clearInterval)
+    frogArr.forEach(frog => {
+        clearInterval(frogFall)
+        frog.clearObject()
+    })
     frogArr.length = 0
-    console.log(frogArr)
+    truck.renderObject()
 }
 
 window.addEventListener('keydown', moveTruck)

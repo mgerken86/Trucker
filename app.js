@@ -4,7 +4,6 @@
 window.onload = (e) => {
     makeLanes()
     setInterval(makeLaneDashes, 900)
-
 }
 
 
@@ -15,14 +14,16 @@ window.onload = (e) => {
 //Display the points (or even better, have it be 'points until fighting boss' and subtract from that)
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
+const scoreboard = document.getElementById('scoreboard')
+let currentScore = 0
 const startBtn = document.getElementById('start-btn')
-//this is where all intervals go to clear them all at once
-let intervals = []
+let goldFrogArr = []
 let frogArr = []
-//this is to set and clear interval for making frogs
-let frogTimer
-//this is to set and clear interval for frogs falling
-let frogFall
+
+const showScore = () => {
+    scoreboard.textContent = `SCORE: ${currentScore}`
+}
+
 
 
 
@@ -75,7 +76,7 @@ const makeLaneDashes = () => {
     //create array of staggered dashes across entire width
     const laneDashesArr = [
         laneDash1 = new Object(50, -50, ctxTwo, 'yellow', 2, 50),
-        laneDash2 = new Object(150, -100, ctxTwo,'yellow', 2, 50),
+        laneDash2 = new Object(150, -100, ctxTwo, 'yellow', 2, 50),
         laneDash3 = new Object(250, -50, ctxTwo, 'yellow', 2, 50),
         laneDash4 = new Object(350, -100, ctxTwo, 'yellow', 2, 50),
         laneDash5 = new Object(450, -50, ctxTwo, 'yellow', 2, 50),
@@ -93,68 +94,81 @@ const makeLaneDashes = () => {
     })
 }
 
-function detectHit(p1, p2){
+function detectHit(p1, p2) {
     let hitTest =
         p1.y + p1.height > p2.y &&
         p1.y < p2.y + p2.height &&
         p1.x + p1.width > p2.x &&
         p1.x < p2.x + p2.width
-    if (hitTest){
+    if (hitTest) {
+        if (p2.color === 'green'){
         // alert('Game Over!!')
         resetGame()
+        }
+        if (p2.color === 'gold'){
+            currentScore += 100
+            showScore()
+            goldFrogArr.shift()
+            p2.clearObject()
+        }
     }
 }
 
 const makeFrog = () => {
-    console.log(frogArr)
+
     //possible lane array are the middles of all of the lanes
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //frog with random x axis
-    frog = new Object(possibleLaneArray[randomIndex] -25, -100, ctx, 'green', 50, 40)
+    frog = new Object(possibleLaneArray[randomIndex] - 25, -100, ctx, 'green', 50, 40)
     //push frog object into array
     frogArr.push(frog)
+
     //each frog in array gets an interval to have it 'rain' down. 
-    frogArr.forEach(frog => {
-        frogFall = setInterval(() => {
-            frog.clearObject()
-            frog.y > 800 ? null : frog.y += 3
-            frog.renderObject()
-            detectHit(truck, frog)
-        }, 50)
-        intervals.push(frogFall)
-        //following condition keeps arrays/frogs from getting too many and slowing things down
-        if (frog.y > 800) {
-            frogArr.shift()
-            intervals.shift()
-            frog.clearObject()
-        }
-    })
+
+
+
+
+    // frogArr.forEach(frog => {
+    //     if (frog.y < 0) {
+    //         frogFall = setInterval(() => {
+    //             frog.clearObject()
+    //             frog.y > 800 ? clearInterval(frogFall) : frog.y += 3
+    //             frog.renderObject()
+    //             detectHit(truck, frog)
+    //         }, 50)
+    //     }
+    //     intervals.push(frogFall)
+    //     //following condition keeps arrays/frogs from getting too many and slowing things down
+    //     if (frog.y > 800) {
+    //         frogArr.shift()
+    //         intervals.shift()
+    //         frog.clearObject()
+    //     }
+    // })
 }
+
+const makeRain = (arr, distance) => {
+    for (let i = 0; i < arr.length; i++) {
+        detectHit(truck, arr[i])
+        arr[i].clearObject()
+        arr[i].y += distance
+        arr[i].renderObject()
+        //This boots frog out of array when they've gone out of screen
+        if (arr[i].y > 800) arr.shift()
+    }
+}
+frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
+goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
+
 
 const makeGoldenFrog = () => {
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //frog with random x axis
-    goldFrog = new Object(possibleLaneArray[randomIndex] -25, -100, ctx, 'yellow', 50, 40)
-    //push frog object into array
-    frogArr.push(frog)
+    goldFrog = new Object(possibleLaneArray[randomIndex] - 15, -100, ctxTwo, 'gold', 30, 30)
+    goldFrogArr.push(goldFrog)
     //each frog in array gets an interval to have it 'rain' down. 
-    frogArr.forEach(frog => {
-        frogFall = setInterval(() => {
-            frog.clearObject()
-            frog.y > 800 ? null : frog.y += 3
-            frog.renderObject()
-            detectHit(truck, frog)
-        }, 50)
-        intervals.push(frogFall)
-        //following condition keeps arrays/frogs from getting too many and slowing things down
-        if (frog.y > 800) {
-            frogArr.shift()
-            intervals.shift()
-            frog.clearObject()
-        }
-    })
 }
 
 
@@ -187,14 +201,20 @@ const moveTruck = (e) => {
 
 const resetGame = () => {
     alert('You lose!')
+    currentScore = 0
+    showScore()
     clearInterval(frogTimer)
-    //this removes the interval from every displayed frog. It stops them from raining down and re-rendering
-    intervals.forEach(clearInterval)
+    clearInterval(frogTimer2)
+    clearInterval(frogsRainingDown)
+    clearInterval(frogsRainingDown2)
     frogArr.forEach(frog => {
-        clearInterval(frogFall)
+        frog.clearObject()
+    })
+    goldFrogArr.forEach(frog => {
         frog.clearObject()
     })
     frogArr.length = 0
+    goldFrogArr.length = 0
     truck.renderObject()
 }
 
@@ -203,7 +223,12 @@ window.addEventListener('keydown', moveTruck)
 
 startBtn.addEventListener('click', (e) => {
     drawTruck()
-    frogTimer = setInterval(makeFrog, 85)
+    showScore()
+    frogTimer = setInterval(makeFrog, 300)
+    frogTimer2 = setInterval(makeGoldenFrog, 2000)
+    frogsRainingDown
+    goldFrogsRainingDown 
+    setTimeout(frogsRainingDown, 5000)
 })
 
 //spawn frogs that come down from x axis and come across from y axis

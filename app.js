@@ -101,12 +101,28 @@ function detectHit(p1, p2) {
         p1.x + p1.width > p2.x &&
         p1.x < p2.x + p2.width
     if (hitTest) {
-        if (p2.color === 'green'){
-        // alert('Game Over!!')
-        resetGame()
+        if (p2.color === 'green') {
+            alert('Game Over, you lose!!')
+            resetGame()
         }
-        if (p2.color === 'gold'){
+        if (p2.color === 'gold') {
             currentScore += 100
+                if (currentScore === 500){
+                    clearInterval(frogsRainingDown)
+                    frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
+                }
+                if (currentScore === 1000){
+                    clearInterval(frogsRainingDown)
+                    frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
+                }
+                if (currentScore === 1500){
+                    clearInterval(frogsRainingDown)
+                    frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
+                }
+                if (currentScore === 2000){
+                    alert('Game over, YOU WIN!!!!')
+                    resetGame()
+                }
             showScore()
             goldFrogArr.shift()
             p2.clearObject()
@@ -151,15 +167,17 @@ const makeFrog = () => {
 const makeRain = (arr, distance) => {
     for (let i = 0; i < arr.length; i++) {
         detectHit(truck, arr[i])
-        arr[i].clearObject()
-        arr[i].y += distance
-        arr[i].renderObject()
-        //This boots frog out of array when they've gone out of screen
-        if (arr[i].y > 800) arr.shift()
+        if (arr.length > 0) {
+            arr[i].clearObject()
+            arr[i].y += distance
+            arr[i].renderObject()
+            //This boots frog out of array when they've gone out of screen
+            if (arr[i].y > 800) {
+                arr.shift()
+            }
+        }
     }
 }
-frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
-goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
 
 
 const makeGoldenFrog = () => {
@@ -199,14 +217,17 @@ const moveTruck = (e) => {
     truck.renderObject()
 }
 
-const resetGame = () => {
-    alert('You lose!')
-    currentScore = 0
-    showScore()
+const clearAllIntervals = () => {
     clearInterval(frogTimer)
     clearInterval(frogTimer2)
     clearInterval(frogsRainingDown)
-    clearInterval(frogsRainingDown2)
+    clearInterval(goldFrogsRainingDown)
+}
+
+const resetGame = () => {
+    currentScore = 0
+    showScore()
+    clearAllIntervals()
     frogArr.forEach(frog => {
         frog.clearObject()
     })
@@ -226,8 +247,8 @@ startBtn.addEventListener('click', (e) => {
     showScore()
     frogTimer = setInterval(makeFrog, 300)
     frogTimer2 = setInterval(makeGoldenFrog, 2000)
-    frogsRainingDown
-    goldFrogsRainingDown 
+    frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
+    goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
     setTimeout(frogsRainingDown, 5000)
 })
 

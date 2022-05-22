@@ -12,10 +12,15 @@ Make it to the job interview in one piece to land your dream job!!!
 
 
 As a user I want to
+
 .Experience different levels featuring completely different gameplay
+
 .Level 1: Dodge large frogs while accumulating points by hitting smaller ones. The large frogs speed up as your points go up
+
 .Level 2: Navigate through a twisty-turny tunnel, avoiding bumping into the sides
+
 .Level 3: Cross the flooded highway by using frog-carcasses as platforms
+
 
 Technologies Used
 HTML

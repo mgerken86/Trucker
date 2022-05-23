@@ -7,25 +7,18 @@ window.onload = (e) => {
 }
 
 
-//Create the canvas
-//75% of width of screen? 100% height
-//create the car
-//create multiple lanes to travel left and right in. Have yellow lines for lanes come down from x axis in middle of lane
-//Display the points (or even better, have it be 'points until fighting boss' and subtract from that)
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
-let currentScore = 0
+const waterButton = document.getElementById('water-button')
 const startBtn = document.getElementById('start-btn')
 let goldFrogArr = []
 let frogArr = []
+let currentScore = 0
 
 const showScore = () => {
     scoreboard.textContent = `SCORE: ${currentScore}`
 }
-
-
-
 
 
 class Object {
@@ -47,15 +40,6 @@ class Object {
 
 }
 
-//to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
-let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
-
-
-//made this as a function to setInterval on it to minimize the lane lines carving into the truck
-const drawTruck = () => {
-    truck.clearObject()
-    truck.renderObject()
-}
 const makeLanes = () => {
     const lanes = [
         lane1 = new Object(100, 0, ctxTwo, 'white', 4, 900),
@@ -94,38 +78,50 @@ const makeLaneDashes = () => {
     })
 }
 
-function detectHit(p1, p2) {
+function detectHit(obj1, obj2) {
     let hitTest =
-        p1.y + p1.height > p2.y &&
-        p1.y < p2.y + p2.height &&
-        p1.x + p1.width > p2.x &&
-        p1.x < p2.x + p2.width
+        obj1.y + obj1.height > obj2.y &&
+        obj1.y < obj2.y + obj2.height &&
+        obj1.x + obj1.width > obj2.x &&
+        obj1.x < obj2.x + obj2.width
     if (hitTest) {
-        if (p2.color === 'green') {
+        if (obj2.color === 'green') {
             alert('Game Over, you lose!!')
             resetGame()
         }
-        if (p2.color === 'gold') {
+        if (obj2.color === 'gold') {
             currentScore += 100
+                //speed up frogs when points accumulate. 
+                //Also make frogs faster to keep canvas from getting less frog-dense as they speed up
                 if (currentScore === 500){
                     clearInterval(frogsRainingDown)
                     frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
+                    clearInterval(frogTimer)
+                    frogTimer = setInterval(makeFrog, 225)
+
                 }
                 if (currentScore === 1000){
                     clearInterval(frogsRainingDown)
                     frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
+                    clearInterval(frogTimer)
+                    frogTimer = setInterval(makeFrog, 150)
+
                 }
                 if (currentScore === 1500){
                     clearInterval(frogsRainingDown)
                     frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
+                    clearInterval(frogTimer)
+                    frogTimer = setInterval(makeFrog, 100)
+
                 }
                 if (currentScore === 2000){
                     alert('Game over, YOU WIN!!!!')
                     resetGame()
                 }
             showScore()
+            //remove touched goldFrog from array to keep it from re-rendering with the setInterval
             goldFrogArr.shift()
-            p2.clearObject()
+            obj2.clearObject()
         }
     }
 }
@@ -136,32 +132,18 @@ const makeFrog = () => {
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //frog with random x axis
-    frog = new Object(possibleLaneArray[randomIndex] - 25, -100, ctx, 'green', 50, 40)
+    frog = new Object(possibleLaneArray[randomIndex] -25, -100, ctx, 'green', 50, 40)
     //push frog object into array
     frogArr.push(frog)
+}
 
+const makeGoldenFrog = () => {
+    possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
+    randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
+    //frog with random x axis
+    goldFrog = new Object(possibleLaneArray[randomIndex] - 15, -100, ctxTwo, 'gold', 30, 50)
+    goldFrogArr.push(goldFrog)
     //each frog in array gets an interval to have it 'rain' down. 
-
-
-
-
-    // frogArr.forEach(frog => {
-    //     if (frog.y < 0) {
-    //         frogFall = setInterval(() => {
-    //             frog.clearObject()
-    //             frog.y > 800 ? clearInterval(frogFall) : frog.y += 3
-    //             frog.renderObject()
-    //             detectHit(truck, frog)
-    //         }, 50)
-    //     }
-    //     intervals.push(frogFall)
-    //     //following condition keeps arrays/frogs from getting too many and slowing things down
-    //     if (frog.y > 800) {
-    //         frogArr.shift()
-    //         intervals.shift()
-    //         frog.clearObject()
-    //     }
-    // })
 }
 
 const makeRain = (arr, distance) => {
@@ -171,7 +153,7 @@ const makeRain = (arr, distance) => {
             arr[i].clearObject()
             arr[i].y += distance
             arr[i].renderObject()
-            //This boots frog out of array when they've gone out of screen
+            //This boots frog out of array when they've gone off screen
             if (arr[i].y > 800) {
                 arr.shift()
             }
@@ -179,22 +161,17 @@ const makeRain = (arr, distance) => {
     }
 }
 
-
-const makeGoldenFrog = () => {
-    possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
-    randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
-    //frog with random x axis
-    goldFrog = new Object(possibleLaneArray[randomIndex] - 15, -100, ctxTwo, 'gold', 30, 30)
-    goldFrogArr.push(goldFrog)
-    //each frog in array gets an interval to have it 'rain' down. 
+//to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
+let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
+//made this as a function to setInterval on it to minimize the lane lines carving into the truck
+const drawTruck = () => {
+    truck.clearObject()
+    truck.renderObject()
 }
 
 
-//assign direction arrow inputs to car => each left and right shifts over one lane
-//limit car to stay within boundaries(the road, not the grass)
-//limit the car to only being able to travel the y axis a little bit 
-//switch statement with Arrow Key cases
 
+//assign direction arrow inputs to car => each left and right shifts over one lane
 const moveTruck = (e) => {
     //immediately clear out the 'old' truck
     truck.clearObject()
@@ -251,6 +228,17 @@ startBtn.addEventListener('click', (e) => {
     goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
     setTimeout(frogsRainingDown, 5000)
 })
+
+
+// ***** WATER LEVEL *****
+const makeWater = () => {
+    water = new Object(0, 0, ctx, 'blue', ctx.width, 450)
+    water.renderObject()
+}
+waterButton.addEventListener('click', makeWater)
+
+
+
 
 //spawn frogs that come down from x axis and come across from y axis
 //use math.random() to choose x axis

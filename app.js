@@ -3,7 +3,7 @@
 //3 Sec Countdown timer until canvas starts 'moving'
 window.onload = (e) => {
     makeLanes()
-    setInterval(makeLaneDashes, 900)
+    return displayDashes = setInterval(makeLaneDashes, 900)
 }
 
 
@@ -91,33 +91,33 @@ function detectHit(obj1, obj2) {
         }
         if (obj2.color === 'gold') {
             currentScore += 100
-                //speed up frogs when points accumulate. 
-                //Also make frogs faster to keep canvas from getting less frog-dense as they speed up
-                if (currentScore === 500){
-                    clearInterval(frogsRainingDown)
-                    frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
-                    clearInterval(frogTimer)
-                    frogTimer = setInterval(makeFrog, 225)
+            //speed up frogs when points accumulate. 
+            //Also make frogs faster to keep canvas from getting less frog-dense as they speed up
+            if (currentScore === 500) {
+                clearInterval(frogsRainingDown)
+                frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
+                clearInterval(frogTimer)
+                frogTimer = setInterval(makeFrog, 225)
 
-                }
-                if (currentScore === 1000){
-                    clearInterval(frogsRainingDown)
-                    frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
-                    clearInterval(frogTimer)
-                    frogTimer = setInterval(makeFrog, 150)
+            }
+            if (currentScore === 1000) {
+                clearInterval(frogsRainingDown)
+                frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
+                clearInterval(frogTimer)
+                frogTimer = setInterval(makeFrog, 150)
 
-                }
-                if (currentScore === 1500){
-                    clearInterval(frogsRainingDown)
-                    frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
-                    clearInterval(frogTimer)
-                    frogTimer = setInterval(makeFrog, 100)
+            }
+            if (currentScore === 1500) {
+                clearInterval(frogsRainingDown)
+                frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
+                clearInterval(frogTimer)
+                frogTimer = setInterval(makeFrog, 100)
 
-                }
-                if (currentScore === 2000){
-                    alert('Game over, YOU WIN!!!!')
-                    resetGame()
-                }
+            }
+            if (currentScore === 2000) {
+                alert('Game over, YOU WIN!!!!')
+                resetGame()
+            }
             showScore()
             //remove touched goldFrog from array to keep it from re-rendering with the setInterval
             goldFrogArr.shift()
@@ -132,7 +132,7 @@ const makeFrog = () => {
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //frog with random x axis
-    frog = new Object(possibleLaneArray[randomIndex] -25, -100, ctx, 'green', 50, 40)
+    frog = new Object(possibleLaneArray[randomIndex] - 25, -100, ctx, 'green', 50, 40)
     //push frog object into array
     frogArr.push(frog)
 }
@@ -140,7 +140,7 @@ const makeFrog = () => {
 const makeGoldenFrog = () => {
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
-    //frog with random x axis
+    //put this one on ctx2 to be behind other frogs 
     goldFrog = new Object(possibleLaneArray[randomIndex] - 15, -100, ctxTwo, 'gold', 30, 50)
     goldFrogArr.push(goldFrog)
     //each frog in array gets an interval to have it 'rain' down. 
@@ -184,7 +184,9 @@ const moveTruck = (e) => {
             truck.x > 25 ? truck.x -= 100 : null
             break
         case 'ArrowUp':
-            truck.y > 450 ? truck.y -= 100 : null
+            truck.y > 0 ? truck.y -= 100 : null
+            console.log(truck.y)
+            // truck.y > 450 ? truck.y -= 100 : null
             break
         case 'ArrowDown':
             truck.y < canvas.height - 140 ? truck.y += 100 : null
@@ -232,11 +234,35 @@ startBtn.addEventListener('click', (e) => {
 
 // ***** WATER LEVEL *****
 const makeWater = () => {
-    water = new Object(0, 0, ctx, 'blue', ctx.width, 450)
+    clearInterval(displayDashes)
+    water = new Object(0, 0, ctx, 'blue', 920, 510)
     water.renderObject()
 }
-waterButton.addEventListener('click', makeWater)
 
+const makeWaterLanes = () => {
+    const waterLanes = [
+        waterLane1 = new Object(0, 510, ctx, 'white', 900, 3),
+        waterLane1 = new Object(0, 410, ctx, 'white', 900, 3),
+        waterLane2 = new Object(0, 310, ctx, 'white', 900, 3),
+        waterLane3 = new Object(0, 210, ctx, 'white', 900, 3),
+        waterLane4 = new Object(0, 110, ctx, 'white', 900, 3),
+        waterLane5 = new Object(0, 10,  ctx, 'white', 900, 3),
+    ]
+    waterLanes.forEach(lane => {
+        lane.renderObject()
+    })
+}
+
+
+
+
+
+
+
+waterButton.addEventListener('click', () => {
+    makeWater()
+    makeWaterLanes()
+})
 
 
 

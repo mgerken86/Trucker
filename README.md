@@ -16,7 +16,3 @@ As a user I want to
 .Level 2: Navigate through a twisty-turny tunnel, avoiding bumping into the sides
 
 .Level 3: Cross the flooded highway by using frog-carcasses as platforms
-
-Technologies Used HTML CSS JavaScript (logic and DOM manipulation) Canvas
-
-Wireframes: what game will look like

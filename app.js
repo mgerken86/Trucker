@@ -10,6 +10,7 @@ window.onload = (e) => {
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
 const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
+const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
 
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button')
@@ -17,6 +18,8 @@ let goldFrogArr = []
 let frogArr = []
 let platformArr = []
 let currentScore = 0
+let levelOne = true
+let levelTwo = false
 
 const showScore = () => {
     scoreboard.textContent = `SCORE: ${currentScore}`
@@ -44,14 +47,14 @@ class Object {
 
 const makeLanes = () => {
     const lanes = [
-        lane1 = new Object(100, 0, ctxTwo, 'white', 4, 900),
-        lane2 = new Object(200, 0, ctxTwo, 'white', 4, 900),
-        lane3 = new Object(300, 0, ctxTwo, 'white', 4, 900),
-        lane4 = new Object(400, 0, ctxTwo, 'white', 4, 900),
-        lane5 = new Object(500, 0, ctxTwo, 'white', 4, 900),
-        lane6 = new Object(600, 0, ctxTwo, 'white', 4, 900),
-        lane7 = new Object(700, 0, ctxTwo, 'white', 4, 900),
-        lane8 = new Object(800, 0, ctxTwo, 'white', 4, 900)
+        lane1 = new Object(100, 0, ctxThree, 'white', 4, 900),
+        lane2 = new Object(200, 0, ctxThree, 'white', 4, 900),
+        lane3 = new Object(300, 0, ctxThree, 'white', 4, 900),
+        lane4 = new Object(400, 0, ctxThree, 'white', 4, 900),
+        lane5 = new Object(500, 0, ctxThree, 'white', 4, 900),
+        lane6 = new Object(600, 0, ctxThree, 'white', 4, 900),
+        lane7 = new Object(700, 0, ctxThree, 'white', 4, 900),
+        lane8 = new Object(800, 0, ctxThree, 'white', 4, 900)
     ]
     lanes.forEach(lane => {
         lane.renderObject()
@@ -187,11 +190,19 @@ const moveTruck = (e) => {
     truck.clearObject()
     switch (e.key) {
         case 'ArrowRight':
-            truck.x < 825 ? truck.x += 100 : null
+            if (levelTwo) {
+                truck.x < 825 ? truck.x += 25 : null
+            } else {
+                truck.x < 825 ? truck.x += 100 : null
+            }
             break
         case 'ArrowLeft':
-            //chose 25 because that's the closest it gets to the left border
-            truck.x > 25 ? truck.x -= 100 : null
+            if (levelTwo) {
+                truck.x > 25 ? truck.x -= 25 : null
+            } else {
+                //chose 25 because that's the closest it gets to the left border
+                truck.x > 25 ? truck.x -= 100 : null
+            }
             break
         case 'ArrowUp':
             truck.y > 0 ? truck.y -= 100 : null
@@ -204,18 +215,14 @@ const moveTruck = (e) => {
     //render truck with new coordinates
     truck.renderObject()
 }
+window.addEventListener('keydown', moveTruck)
 
-const clearAllIntervals = () => {
+
+const clearAllIntervalsLevelOne = () => {
     clearInterval(frogTimer)
     clearInterval(frogTimer2)
     clearInterval(frogsRainingDown)
     clearInterval(goldFrogsRainingDown)
-}
-
-const resetGame = () => {
-    currentScore = 0
-    showScore()
-    clearAllIntervals()
     frogArr.forEach(frog => {
         frog.clearObject()
     })
@@ -224,41 +231,51 @@ const resetGame = () => {
     })
     frogArr.length = 0
     goldFrogArr.length = 0
+}
+const clearAllIntervalsLevelTwo = () => {
+    clearInterval(platformsInterval)
+    clearInterval(movingPlatformsInterval)
+    clearInterval(makingGoldFrogsInterval)
+    clearInterval(movingGoldFrogsInterval)
+    goldFrogArr.forEach(frog => {
+        frog.clearObject()
+    })
+    goldFrogArr.length = 0
+    platformArr.forEach(platform => {
+        platform.clearObject()
+    })
+    platformArr.length = 0
+
+}
+const resetGame = () => {
+    currentScore = 0
+    showScore()
+    if (levelOne) clearAllIntervalsLevelOne()
+    if (levelTwo) clearAllIntervalsLevelTwo()
     truck.renderObject()
 }
-
-window.addEventListener('keydown', moveTruck)
-
-
-startBtn.addEventListener('click', (e) => {
-    drawTruck()
-    showScore()
-    frogTimer = setInterval(makeFrog, 300)
-    frogTimer2 = setInterval(makeGoldenFrog, 2000)
-    frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
-    goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
-    setTimeout(frogsRainingDown, 5000)
-})
 
 
 // ***** WATER LEVEL *****
 const makeWater = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+    ctxThree.clearRect(0, 0, canvas.width, canvas.height)
+    ctxFour.clearRect(0, 0, canvas.width, canvas.height)
     truck.renderObject()
-    water = new Object(0, 0, ctxThree, 'blue', 920, 510)
+    water = new Object(0, 0, ctxFour, 'blue', 920, 510)
     water.renderObject()
-
+    return water
 }
 
 const makeWaterLanes = () => {
     const waterLanes = [
-        waterLane0 = new Object(0, 510, ctx, 'white', canvas.width + 12, 3),
-        waterLane1 = new Object(0, 410, ctx, 'white', canvas.width, 3),
-        waterLane2 = new Object(0, 310, ctx, 'white', canvas.width, 3),
-        waterLane3 = new Object(0, 210, ctx, 'white', canvas.width, 3),
-        waterLane4 = new Object(0, 110, ctx, 'white', canvas.width, 3),
-        waterLane5 = new Object(0, 10, ctx, 'white', canvas.width, 3),
+        waterLane0 = new Object(0, 510, ctxTwo, 'white', canvas.width + 12, 3),
+        waterLane1 = new Object(0, 410, ctxTwo, 'white', canvas.width, 3),
+        waterLane2 = new Object(0, 310, ctxTwo, 'white', canvas.width, 3),
+        waterLane3 = new Object(0, 210, ctxTwo, 'white', canvas.width, 3),
+        waterLane4 = new Object(0, 110, ctxTwo, 'white', canvas.width, 3),
+        waterLane5 = new Object(0, 10, ctxTwo, 'white', canvas.width, 3),
     ]
     waterLanes.forEach(lane => {
         lane.renderObject()
@@ -269,11 +286,23 @@ const makePlatforms = () => {
     possiblePlatformCoordinates = [60, 160, 260, 360, 460]
     randomIndex = Math.floor(Math.random() * possiblePlatformCoordinates.length)
     x = (randomIndex % 2 === 0) ? -50 : canvas.width + 50
-    platform = new Object(x, possiblePlatformCoordinates[randomIndex] - 50, ctxTwo, 'purple', 150, 100)
+    platform = new Object(x, possiblePlatformCoordinates[randomIndex] - 50, ctxThree, 'purple', 150, 100)
     platformArr.push(platform)
 }
 
-const movePlatforms = (arr, distance) => {
+const movePlatforms = (arr) => {
+    showScore()
+    distance = 1
+    if (currentScore >= 3500) {
+        distance = 2
+    } else
+        if (currentScore >= 3000) {
+            distance = 3
+        } else
+            if (currentScore >= 2500) {
+                distance = 2
+            }
+
     arr.forEach(platform => {
         platform.renderObject()
         if (arr.length > 0) {
@@ -290,16 +319,21 @@ const movePlatforms = (arr, distance) => {
             }
             moveObjectLeftOrRight(platform)
             platform.renderObject()
+            //this moves truck with platform
+            //*****  BUG ALERT  ***** => TRUCK STOPS AT EDGES OF SCREEN BUT WON'T SLIDE IF SWITCHING PLATFORMS
             if (detectHit(truck, platform)) {
-                truck.clearObject()
-                moveObjectLeftOrRight(truck)
-                truck.renderObject()
-                console.log('platform')
-            } 
+                if (truck.x < 0 || truck.x > 850) {
+                    return null
+                } else {
+                    truck.clearObject()
+                    moveObjectLeftOrRight(truck)
+                    truck.renderObject()
+                }
+            }
         }
     })
     //if truck isn't on any platform, detectHit for water
-    if (truck.y < 510 && arr.every(platform => !detectHit(truck, platform))){
+    if (truck.y < 510 && arr.every(platform => !detectHit(truck, platform))) {
         detectHit(truck, water)
     }
     if (arr.length > 20) {
@@ -307,22 +341,78 @@ const movePlatforms = (arr, distance) => {
     }
 }
 
+const makeGoldFrogInWater = () => {
+    possibleLaneArray = [60, 160, 260, 360, 460]
+    randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
+    //x coordinates are opposite from platforms so they go in opposite directions
+    x = (randomIndex % 2 === 1) ? -50 : canvas.width + 50
+    goldFrog = new Object(x, possibleLaneArray[randomIndex] - 15, ctxTwo, 'gold', 50, 30)
+    goldFrogArr.push(goldFrog)
+}
+const moveGoldFrogsInWater = (arr) => {
+    distance = 2
+    arr.forEach(frog => {
+        frog.renderObject()
+        if (arr.length > 0) {
+            frog.clearObject()
+            //this moves some platforms right, some platforms left
+            const moveObjectLeftOrRight = (obj) => {
+                if (obj.y === 10 ||
+                    obj.y === 210 ||
+                    obj.y === 410) {
+                    obj.x -= distance
+                } else {
+                    obj.x += distance
+                }
+            }
+            moveObjectLeftOrRight(frog)
+            frog.renderObject()
+            //this will automatically add to score because of conditions if hitTest is true
+            detectHit(truck, frog)   
+        }
+    })
+    if (arr.length > 20) {
+        arr.shift()
+    }
+}
 //hit test for water
 //if you touch any part of the water you die
 //if your entire truck is on the platform, it moves with the platform
 
 
-
+startBtn.addEventListener('click', (e) => {
+    levelOne = true
+    levelTwo = false
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+    ctxThree.clearRect(0, 0, canvas.width, canvas.height)
+    ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    makeLanes()
+    drawTruck()
+    showScore()
+    frogTimer = setInterval(makeFrog, 300)
+    frogTimer2 = setInterval(makeGoldenFrog, 2000)
+    frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
+    goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
+    setTimeout(frogsRainingDown, 5000)
+})
 
 
 
 
 waterButton.addEventListener('click', () => {
+    levelOne = false
+    levelTwo = true
+    currentScore = 2000
+    showScore()
+    drawTruck()
     clearInterval(displayDashes)
     makeWater()
     makeWaterLanes()
     platformsInterval = setInterval(makePlatforms, 1000)
-    movingPlatformsInterval = setInterval(movePlatforms, 10, platformArr, 1)
+    movingPlatformsInterval = setInterval(movePlatforms, 10, platformArr)
+    makingGoldFrogsInterval = setInterval(makeGoldFrogInWater, 500)
+    movingGoldFrogsInterval = setInterval(moveGoldFrogsInWater, 10, goldFrogArr)
     // movingPlatformsInterval = setInterval(movePlatforms, 1000, platformArr, 10)
 })
 

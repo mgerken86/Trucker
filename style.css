@@ -27,6 +27,9 @@ button {
     z-index: 5;
 }
 #canvas-two {
+    z-index: 3;
+}
+#canvas-three {
     background-color: darkgray;
     z-index: 1;
     border-left: 12px solid white;

@@ -9,11 +9,13 @@ window.onload = (e) => {
 
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
+const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
- 
+
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button')
 let goldFrogArr = []
 let frogArr = []
+let platformArr = []
 let currentScore = 0
 
 const showScore = () => {
@@ -59,15 +61,15 @@ const makeLanes = () => {
 const makeLaneDashes = () => {
     //create array of staggered dashes across entire width
     const laneDashesArr = [
-        laneDash1 = new Object(50, -50, ctxTwo, 'yellow', 2, 50),
-        laneDash2 = new Object(150, -100, ctxTwo, 'yellow', 2, 50),
-        laneDash3 = new Object(250, -50, ctxTwo, 'yellow', 2, 50),
-        laneDash4 = new Object(350, -100, ctxTwo, 'yellow', 2, 50),
-        laneDash5 = new Object(450, -50, ctxTwo, 'yellow', 2, 50),
-        laneDash6 = new Object(550, -100, ctxTwo, 'yellow', 2, 50),
-        laneDash7 = new Object(650, -50, ctxTwo, 'yellow', 2, 50),
-        laneDash8 = new Object(750, -100, ctxTwo, 'yellow', 2, 50),
-        laneDash9 = new Object(850, -50, ctxTwo, 'yellow', 2, 50)
+        laneDash1 = new Object(50, -50, ctxThree, 'yellow', 2, 50),
+        laneDash2 = new Object(150, -100, ctxThree, 'yellow', 2, 50),
+        laneDash3 = new Object(250, -50, ctxThree, 'yellow', 2, 50),
+        laneDash4 = new Object(350, -100, ctxThree, 'yellow', 2, 50),
+        laneDash5 = new Object(450, -50, ctxThree, 'yellow', 2, 50),
+        laneDash6 = new Object(550, -100, ctxThree, 'yellow', 2, 50),
+        laneDash7 = new Object(650, -50, ctxThree, 'yellow', 2, 50),
+        laneDash8 = new Object(750, -100, ctxThree, 'yellow', 2, 50),
+        laneDash9 = new Object(850, -50, ctxThree, 'yellow', 2, 50)
     ]
     laneDashesArr.forEach(dash => {
         setInterval(() => {
@@ -85,9 +87,15 @@ function detectHit(obj1, obj2) {
         obj1.x + obj1.width > obj2.x &&
         obj1.x < obj2.x + obj2.width
     if (hitTest) {
-        if (obj2.color === 'green') {
-            alert('Game Over, you lose!!')
-            resetGame()
+        if (obj2.color === 'purple') {
+            return true
+        } else {
+            if (obj2.color === 'green' ||
+                obj2.color === 'blue') {
+                drawTruck()
+                alert('Game Over, you lose!!')
+                resetGame()
+            }
         }
         if (obj2.color === 'gold') {
             currentScore += 100
@@ -166,6 +174,8 @@ let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 5
 //made this as a function to setInterval on it to minimize the lane lines carving into the truck
 const drawTruck = () => {
     truck.clearObject()
+    truck.x = canvas.width / 2 - 25
+    truck.y = canvas.height - 140
     truck.renderObject()
 }
 
@@ -185,7 +195,6 @@ const moveTruck = (e) => {
             break
         case 'ArrowUp':
             truck.y > 0 ? truck.y -= 100 : null
-            console.log(truck.y)
             // truck.y > 450 ? truck.y -= 100 : null
             break
         case 'ArrowDown':
@@ -237,23 +246,70 @@ const makeWater = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     truck.renderObject()
-    water = new Object(0, 0, ctxTwo, 'blue', 920, 510)
+    water = new Object(0, 0, ctxThree, 'blue', 920, 510)
     water.renderObject()
+
 }
 
 const makeWaterLanes = () => {
     const waterLanes = [
-        waterLane0 = new Object(0, 510, ctx, 'white', canvas.width, 3),
+        waterLane0 = new Object(0, 510, ctx, 'white', canvas.width + 12, 3),
         waterLane1 = new Object(0, 410, ctx, 'white', canvas.width, 3),
         waterLane2 = new Object(0, 310, ctx, 'white', canvas.width, 3),
         waterLane3 = new Object(0, 210, ctx, 'white', canvas.width, 3),
         waterLane4 = new Object(0, 110, ctx, 'white', canvas.width, 3),
-        waterLane5 = new Object(0, 10,  ctx, 'white', canvas.width, 3),
+        waterLane5 = new Object(0, 10, ctx, 'white', canvas.width, 3),
     ]
     waterLanes.forEach(lane => {
         lane.renderObject()
     })
 }
+
+const makePlatforms = () => {
+    possiblePlatformCoordinates = [60, 160, 260, 360, 460]
+    randomIndex = Math.floor(Math.random() * possiblePlatformCoordinates.length)
+    x = (randomIndex % 2 === 0) ? -50 : canvas.width + 50
+    platform = new Object(x, possiblePlatformCoordinates[randomIndex] - 50, ctxTwo, 'purple', 150, 100)
+    platformArr.push(platform)
+}
+
+const movePlatforms = (arr, distance) => {
+    arr.forEach(platform => {
+        platform.renderObject()
+        if (arr.length > 0) {
+            platform.clearObject()
+            //this moves some platforms right, some platforms left
+            const moveObjectLeftOrRight = (obj) => {
+                if (obj.y === 10 ||
+                    obj.y === 210 ||
+                    obj.y === 410) {
+                    obj.x += distance
+                } else {
+                    obj.x -= distance
+                }
+            }
+            moveObjectLeftOrRight(platform)
+            platform.renderObject()
+            if (detectHit(truck, platform)) {
+                truck.clearObject()
+                moveObjectLeftOrRight(truck)
+                truck.renderObject()
+                console.log('platform')
+            } 
+        }
+    })
+    //if truck isn't on any platform, detectHit for water
+    if (truck.y < 510 && arr.every(platform => !detectHit(truck, platform))){
+        detectHit(truck, water)
+    }
+    if (arr.length > 20) {
+        arr.shift()
+    }
+}
+
+//hit test for water
+//if you touch any part of the water you die
+//if your entire truck is on the platform, it moves with the platform
 
 
 
@@ -265,6 +321,9 @@ waterButton.addEventListener('click', () => {
     clearInterval(displayDashes)
     makeWater()
     makeWaterLanes()
+    platformsInterval = setInterval(makePlatforms, 1000)
+    movingPlatformsInterval = setInterval(movePlatforms, 10, platformArr, 1)
+    // movingPlatformsInterval = setInterval(movePlatforms, 1000, platformArr, 10)
 })
 
 

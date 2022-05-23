@@ -10,8 +10,8 @@ window.onload = (e) => {
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
-const waterButton = document.getElementById('water-button')
-const startBtn = document.getElementById('start-btn')
+ 
+const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button')
 let goldFrogArr = []
 let frogArr = []
 let currentScore = 0
@@ -92,7 +92,7 @@ function detectHit(obj1, obj2) {
         if (obj2.color === 'gold') {
             currentScore += 100
             //speed up frogs when points accumulate. 
-            //Also make frogs faster to keep canvas from getting less frog-dense as they speed up
+            //Also create frogs faster to keep canvas from getting less frog-dense as they speed up
             if (currentScore === 500) {
                 clearInterval(frogsRainingDown)
                 frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
@@ -234,19 +234,21 @@ startBtn.addEventListener('click', (e) => {
 
 // ***** WATER LEVEL *****
 const makeWater = () => {
-    clearInterval(displayDashes)
-    water = new Object(0, 0, ctx, 'blue', 920, 510)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+    truck.renderObject()
+    water = new Object(0, 0, ctxTwo, 'blue', 920, 510)
     water.renderObject()
 }
 
 const makeWaterLanes = () => {
     const waterLanes = [
-        waterLane1 = new Object(0, 510, ctx, 'white', 900, 3),
-        waterLane1 = new Object(0, 410, ctx, 'white', 900, 3),
-        waterLane2 = new Object(0, 310, ctx, 'white', 900, 3),
-        waterLane3 = new Object(0, 210, ctx, 'white', 900, 3),
-        waterLane4 = new Object(0, 110, ctx, 'white', 900, 3),
-        waterLane5 = new Object(0, 10,  ctx, 'white', 900, 3),
+        waterLane0 = new Object(0, 510, ctx, 'white', canvas.width, 3),
+        waterLane1 = new Object(0, 410, ctx, 'white', canvas.width, 3),
+        waterLane2 = new Object(0, 310, ctx, 'white', canvas.width, 3),
+        waterLane3 = new Object(0, 210, ctx, 'white', canvas.width, 3),
+        waterLane4 = new Object(0, 110, ctx, 'white', canvas.width, 3),
+        waterLane5 = new Object(0, 10,  ctx, 'white', canvas.width, 3),
     ]
     waterLanes.forEach(lane => {
         lane.renderObject()
@@ -260,6 +262,7 @@ const makeWaterLanes = () => {
 
 
 waterButton.addEventListener('click', () => {
+    clearInterval(displayDashes)
     makeWater()
     makeWaterLanes()
 })

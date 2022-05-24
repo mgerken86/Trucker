@@ -53,19 +53,22 @@ class ImageArt {
         this.y = y
         this.width = width
         this.height = height
+        this.img = new Image()
     }
     createImage() {
-        let img = new Image()
-        img.src = this.src
-        img.onload = () => {
-            this.ctx.drawImage(img, this.x, this.y, this.width, this.height)
-        }
+
+        this.img.src = this.src
+        // this.img.onload = () => {
+        //     this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
+        // }
+        this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
     }
     clearObject() {
         this.ctx.clearRect(this.x, this.y, this.width, this.height)
+
     }
 }
-let truck = new ImageArt(ctx, 'images/Truck-birds-eye.png', canvas.width / 2 - 25, canvas.height - 140, 50, 100)
+let truck = new ImageArt(ctx, 'images/Truck.png', canvas.width / 2 - 25, canvas.height - 140, 50, 100)
 truck.createImage()
 // truck.src = 'images/Truck-birds-eye.png'
 // truck.addEventListener('load', (e) => {
@@ -130,7 +133,7 @@ function detectHit(obj1, obj2) {
         obj1.x + obj1.width > obj2.x &&
         obj1.x < obj2.x + obj2.width
     if (hitTest) {
-        if (obj2.color === 'purple') {
+        if (obj2.width === 150) {
             return true
         } else {
             if (obj2.height === 80 ||
@@ -206,8 +209,10 @@ const makeFrog = () => {
     //possible lane array are the middles of all of the lanes
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
-    //frog with random x axis
-    frog = new ImageArt(ctx, 'images/angry-boy.png', possibleLaneArray[randomIndex] - 40, -100, 80, 80)
+    possibleImageSources = ['images/angry-boy.png', 'images/Agry-boy-2.png', 'images/Angry-boy-3.png']
+    src = possibleImageSources[Math.floor(Math.random() * possibleImageSources.length)]
+   
+    frog = new ImageArt(ctx, src, possibleLaneArray[randomIndex] - 40, -100, 80, 80)
     //push frog object into array
     frogArr.push(frog)
 }
@@ -307,7 +312,8 @@ const clearAllIntervalsLevelOne = () => {
     })
     frogArr.length = 0
     goldFrogArr.length = 0
-
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
 }
 
 const createIntervalsLevelTwo = () => {
@@ -402,9 +408,9 @@ const makePlatforms = () => {
     } else {
         x = canvas.width + 50
     }
+    possibleImageSources = ['']
 
-
-    platform = new Object(x, y - 50, ctxThree, 'purple', 150, 100)
+    platform = new ImageArt(ctxThree, 'images/dead-boy.png', x, y - 50, 150, 100)
     platformArr.push(platform)
 
 }
@@ -423,7 +429,7 @@ const movePlatforms = (arr) => {
         }
 
     arr.forEach(platform => {
-        platform.renderObject()
+        platform.createImage()
         if (arr.length > 0) {
             platform.clearObject()
             //this moves some platforms right, some platforms left
@@ -437,7 +443,7 @@ const movePlatforms = (arr) => {
                 }
             }
             moveObjectLeftOrRight(platform)
-            platform.renderObject()
+            platform.createImage()
             //this moves truck with platform
             //*****  BUG ALERT  ***** => TRUCK STOPS AT EDGES OF SCREEN BUT WON'T SLIDE IF SWITCHING PLATFORMS
             if (detectHit(truck, platform)) {
@@ -471,7 +477,8 @@ const makeGoldFrogInWater = () => {
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //x coordinates are opposite from platforms so they go in opposite directions
     x = (randomIndex % 2 === 1) ? -50 : canvas.width + 50
-    goldFrog = new Object(x, possibleLaneArray[randomIndex] - 15, ctxTwo, 'gold', 50, 30)
+    // goldFrog = new Object(x, possibleLaneArray[randomIndex] - 15, ctxTwo, 'gold', 50, 30)
+    goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', x, possibleLaneArray[randomIndex] - 15, 50, 50)
     goldFrogInWaterArr.push(goldFrog)
     if (goldFrogInWaterArr.length > 9) {
         goldFrogInWaterArr.shift()
@@ -516,7 +523,7 @@ startBtn.addEventListener('click', (e) => {
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
     makeLanes()
-    // drawTruck()
+    drawTruck()
     showScore()
     createIntervalsLevelOne()
 })

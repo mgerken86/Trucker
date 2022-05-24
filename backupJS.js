@@ -185,7 +185,7 @@ const makeGoldenFrog = () => {
 
 const makeRain = (arr, distance) => {
     for (let i = 0; i < arr.length; i++) {
-        detectHit(truck.createImage(), arr[i])
+        detectHit(truck, arr[i])
         if (arr.length > 0) {
             arr[i].clearObject()
             arr[i].y += distance
@@ -202,10 +202,10 @@ const makeRain = (arr, distance) => {
 let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
 //made this as a function to setInterval on it to minimize the lane lines carving into the truck
 const drawTruck = () => {
-    truck.createImage().clearObject()
-    truck.createImage().x = canvas.width / 2 - 25
-    truck.createImage().y = canvas.height - 140
-    truck.createImage().renderObject()
+    truck.clearObject()
+    truck.x = canvas.width / 2 - 25
+    truck.y = canvas.height - 140
+    truck.renderObject()
 }
 
 
@@ -213,43 +213,43 @@ const drawTruck = () => {
 //assign direction arrow inputs to car => each left and right shifts over one lane
 const moveTruck = (e) => {
     //immediately clear out the 'old' truck
-    truck.createImage().clearObject()
+    truck.clearObject()
     switch (e.key) {
         case 'ArrowRight':
             if (levelTwo) {
-                truck.createImage().x < 825 ? truck.createImage().x += 25 : null
+                truck.x < 825 ? truck.x += 25 : null
             } else {
-                truck.createImage().x < 825 ? truck.createImage().x += 100 : null
+                truck.x < 825 ? truck.x += 100 : null
             }
             break
         case 'ArrowLeft':
             if (levelTwo) {
-                truck.createImage().x > 25 ? truck.createImage().x -= 25 : null
+                truck.x > 25 ? truck.x -= 25 : null
             } else {
                 //chose 25 because that's the closest it gets to the left border
-                truck.createImage().x > 25 ? truck.createImage().x -= 100 : null
+                truck.x > 25 ? truck.x -= 100 : null
             }
             break
         case 'ArrowUp':
-            console.log(truck.createImage().y)
+            console.log(truck.y)
             if (currentScore >= 3000) {
-                truck.createImage().y > 0 ? truck.createImage().y -= 100 : null
+                truck.y > 0 ? truck.y -= 100 : null
                 //How it's decided you win level 2
-                if (truck.createImage().y < 10) {
+                if (truck.y < 10) {
                     alert('YOU BEAT LEVEL 2!!!')
                     resetGame()
                 }
             } else
-                truck.createImage().y > 10 ? truck.createImage().y -= 100 : null
+                truck.y > 10 ? truck.y -= 100 : null
 
             // truck.y > 450 ? truck.y -= 100 : null
             break
         case 'ArrowDown':
-            truck.createImage().y < canvas.height - 140 ? truck.createImage().y += 100 : null
+            truck.y < canvas.height - 140 ? truck.y += 100 : null
             break
     }
     //render truck with new coordinates
-    truck.createImage().renderObject()
+    truck.renderObject()
 }
 window.addEventListener('keydown', moveTruck)
 
@@ -308,7 +308,7 @@ const resetGame = () => {
     showScore()
     if (levelOne) clearAllIntervalsLevelOne()
     if (levelTwo) clearAllIntervalsLevelTwo()
-    truck.createImage().renderObject()
+    truck.renderObject()
 }
 
 
@@ -410,21 +410,21 @@ const movePlatforms = (arr) => {
             platform.renderObject()
             //this moves truck with platform
             //*****  BUG ALERT  ***** => TRUCK STOPS AT EDGES OF SCREEN BUT WON'T SLIDE IF SWITCHING PLATFORMS
-            if (detectHit(truck.createImage(), platform)) {
+            if (detectHit(truck, platform)) {
                 //this keeps truck from going off screen
-                if (truck.createImage().x < 0 || truck.createImage().x > 850) {
+                if (truck.x < 0 || truck.x > 850) {
                     return null
                 } else {
-                    truck.createImage().clearObject()
-                    moveObjectLeftOrRight(truck.createImage())
-                    truck.createImage().renderObject()
+                    truck.clearObject()
+                    moveObjectLeftOrRight(truck)
+                    truck.renderObject()
                 }
             }
         }
     })
     //if truck isn't on any platform, detectHit for water
-    if (truck.createImage().y < 510 && arr.every(platform => !detectHit(truck.createImage(), platform))) {
-        detectHit(truck.createImage(), water)
+    if (truck.y < 510 && arr.every(platform => !detectHit(truck, platform))) {
+        detectHit(truck, water)
     }
     if (arr.length > 20) {
         arr.shift()
@@ -466,7 +466,7 @@ const moveGoldFrogsInWater = (arr) => {
             moveObjectLeftOrRight(frog)
             frog.renderObject()
             //this will automatically add to score because of conditions if hitTest is true
-            detectHit(truck.createImage(), frog)
+            detectHit(truck, frog)
         }
     })
     // arr = arr.filter(frog => {

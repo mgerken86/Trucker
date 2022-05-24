@@ -384,7 +384,6 @@ const movePlatforms = (arr) => {
     distance = 1
 
     if (currentScore >= 3000) {
-        clearInterval(platformsInterval)
         distance = 3
         finishLine = new Object(0, 0, ctxTwo, 'gold', canvas.width + 12, 13)
         finishLine.renderObject()

@@ -11,16 +11,20 @@ const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getC
 const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
+const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button')
 
-const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button')
+//the empty arrays are where I put objects once I make them, and then run intervals on the whole array
 let goldFrogArr = []
 let goldFrogInWaterArr = []
 let frogArr = []
 let platformArr = []
+let tunnelArr = []
+const openingArr = []
 let currentScore = 0
 let lives = 3
 let levelOne = true
 let levelTwo = false
+let levelThree = false
 
 const showScore = () => {
     scoreboard.textContent = `SCORE: ${currentScore}      LIVES: ${lives}`
@@ -46,7 +50,7 @@ class Object {
 }
 
 class ImageArt {
-    constructor(ctx, src, x, y, width, height){
+    constructor(ctx, src, x, y, width, height) {
         this.ctx = ctx
         this.src = src
         this.x = x
@@ -211,7 +215,7 @@ const makeFrog = () => {
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     possibleImageSources = ['images/angry-boy.png', 'images/Agry-boy-2.png', 'images/Angry-boy-3.png']
     src = possibleImageSources[Math.floor(Math.random() * possibleImageSources.length)]
-   
+
     frog = new ImageArt(ctx, src, possibleLaneArray[randomIndex] - 40, -100, 80, 80)
     //push frog object into array
     frogArr.push(frog)
@@ -251,14 +255,14 @@ const moveTruck = (e) => {
     truck.clearObject()
     switch (e.key) {
         case 'ArrowRight':
-            if (levelTwo) {
+            if (levelTwo || levelThree) {
                 truck.x < 825 ? truck.x += 25 : null
             } else {
                 truck.x < 825 ? truck.x += 100 : null
             }
             break
         case 'ArrowLeft':
-            if (levelTwo) {
+            if (levelTwo || levelThree) {
                 truck.x > 25 ? truck.x -= 25 : null
             } else {
                 //chose 25 because that's the closest it gets to the left border
@@ -312,8 +316,6 @@ const clearAllIntervalsLevelOne = () => {
     })
     frogArr.length = 0
     goldFrogArr.length = 0
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
 }
 
 const createIntervalsLevelTwo = () => {
@@ -549,6 +551,57 @@ waterButton.addEventListener('click', () => {
     createIntervalsLevelTwo()
 })
 
+
+
+// *********** LEVEL THREE!!!!!! ***********
+
+const makeTunnel = () => {
+    tunnel = new ImageArt(ctxFour, 'images/bricks.png', 0, -100, canvas.width, 100)
+    tunnel.createImage()
+    tunnelArr.push(tunnel)
+}
+const moveTunnel = (arr, distance) => {
+    arr.forEach(tunnelLine => {
+        tunnelLine.clearObject()
+        tunnelLine.y += distance
+        arr === tunnelArr ? tunnelLine.createImage() : tunnelLine.renderObject()
+        if (tunnelLine.y > 800) {
+            // clearInterval(moveTunnelInterval)
+            // arr.length = 0
+            arr.shift()
+        }
+    })
+}
+let i = 16
+const makeTunnelOpening = () => {
+    possibleXCoordinates = [0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750]
+    tunnelX = possibleXCoordinates[i]
+    iIncrements = [0, -1, 1]
+    opening = new Object(tunnelX, -25, ctxTwo, 'darkgray', 150, 100)
+    openingArr.push(opening)
+    randomIndex = Math.floor(Math.random() * iIncrements.length)
+    if (tunnelX === 0) {
+        i += 1
+    } else if (tunnelX === 750) {
+        i -= 1
+    } else {
+        i += iIncrements[randomIndex]
+    }
+    return i
+}
+tunnelButton.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+    ctxThree.clearRect(0, 0, canvas.width, canvas.height)
+    ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    levelOne = false
+    levelTwo = false
+    levelThree = true
+    makeTunnelInterval = setInterval(makeTunnel, 250)
+    moveTunnelInterval = setInterval(moveTunnel, 100, tunnelArr, 20)
+    makeOpeningInterval = setInterval(makeTunnelOpening, 75)
+    moveOpeningInterval = setInterval(moveTunnel, 60, openingArr, 20)
+})
 
 
 //spawn frogs that come down from x axis and come across from y axis

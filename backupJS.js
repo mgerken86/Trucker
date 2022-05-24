@@ -5,18 +5,14 @@ window.onload = (e) => {
     makeLanes()
 }
 
-
-
 //I use multiple canvases to prevent them from 'cutting' into each other when crossing over on same canvas and to adjust z-index
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
 const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
+
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button')
-
-
-let truck
 let goldFrogArr = []
 let goldFrogInWaterArr = []
 let frogArr = []
@@ -47,6 +43,7 @@ class Object {
     clearObject() {
         this.ctx.clearRect(this.x, this.y, this.width, this.height)
     }
+
 }
 
 const makeLanes = () => {
@@ -188,7 +185,7 @@ const makeGoldenFrog = () => {
 
 const makeRain = (arr, distance) => {
     for (let i = 0; i < arr.length; i++) {
-        detectHit(truck, arr[i])
+        detectHit(truck.createImage(), arr[i])
         if (arr.length > 0) {
             arr[i].clearObject()
             arr[i].y += distance
@@ -202,17 +199,13 @@ const makeRain = (arr, distance) => {
 }
 
 //to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
-// let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
+let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
 //made this as a function to setInterval on it to minimize the lane lines carving into the truck
 const drawTruck = () => {
-    truck = new Image()
-    truck.src = "images/Truck-birds-eye.png"
-    ctx.drawImage(truck, canvas.width / 2 - 25, canvas.height - 140, 50, 100)
-
-    // truck.clearObject()
-    // truck.x = canvas.width / 2 - 25
-    // truck.y = canvas.height - 140
-    // truck.renderObject()
+    truck.createImage().clearObject()
+    truck.createImage().x = canvas.width / 2 - 25
+    truck.createImage().y = canvas.height - 140
+    truck.createImage().renderObject()
 }
 
 
@@ -220,44 +213,43 @@ const drawTruck = () => {
 //assign direction arrow inputs to car => each left and right shifts over one lane
 const moveTruck = (e) => {
     //immediately clear out the 'old' truck
-    truck.clearImage()
-    console.log(e.key)
+    truck.createImage().clearObject()
     switch (e.key) {
         case 'ArrowRight':
             if (levelTwo) {
-                truck.x < 825 ? truck.x += 25 : null
+                truck.createImage().x < 825 ? truck.createImage().x += 25 : null
             } else {
-                truck.x < 825 ? truck.x += 100 : null
+                truck.createImage().x < 825 ? truck.createImage().x += 100 : null
             }
             break
-        case "ArrowLeft":
+        case 'ArrowLeft':
             if (levelTwo) {
-                truck.x > 25 ? truck.x -= 25 : null
+                truck.createImage().x > 25 ? truck.createImage().x -= 25 : null
             } else {
                 //chose 25 because that's the closest it gets to the left border
-                truck.x > 25 ? truck.x -= 100 : null
+                truck.createImage().x > 25 ? truck.createImage().x -= 100 : null
             }
             break
         case 'ArrowUp':
-            console.log(truck.y)
+            console.log(truck.createImage().y)
             if (currentScore >= 3000) {
-                truck.y > 0 ? truck.y -= 100 : null
+                truck.createImage().y > 0 ? truck.createImage().y -= 100 : null
                 //How it's decided you win level 2
-                if (truck.y < 10) {
+                if (truck.createImage().y < 10) {
                     alert('YOU BEAT LEVEL 2!!!')
                     resetGame()
                 }
             } else
-                truck.y > 10 ? truck.y -= 100 : null
+                truck.createImage().y > 10 ? truck.createImage().y -= 100 : null
 
             // truck.y > 450 ? truck.y -= 100 : null
             break
         case 'ArrowDown':
-            truck.y < canvas.height - 140 ? truck.y += 100 : null
+            truck.createImage().y < canvas.height - 140 ? truck.createImage().y += 100 : null
             break
     }
     //render truck with new coordinates
-    truck.drawImage()
+    truck.createImage().renderObject()
 }
 window.addEventListener('keydown', moveTruck)
 
@@ -316,7 +308,7 @@ const resetGame = () => {
     showScore()
     if (levelOne) clearAllIntervalsLevelOne()
     if (levelTwo) clearAllIntervalsLevelTwo()
-    truck.renderObject()
+    truck.createImage().renderObject()
 }
 
 
@@ -339,6 +331,7 @@ const makeWaterLanes = () => {
         lane.renderObject()
     })
 }
+
 const preventDoublesArray = []
 let usePreventDoubles = false
 let possiblePlatformCoordinates = [60, 160, 260, 360, 460]
@@ -386,10 +379,10 @@ const makePlatforms = () => {
 
 }
 
-
 const movePlatforms = (arr) => {
     showScore()
     distance = 1
+
     if (currentScore >= 3000) {
         distance = 3
         finishLine = new Object(0, 0, ctxTwo, 'gold', canvas.width + 12, 13)
@@ -398,6 +391,7 @@ const movePlatforms = (arr) => {
         if (currentScore >= 2500) {
             distance = 2
         }
+
     arr.forEach(platform => {
         platform.renderObject()
         if (arr.length > 0) {
@@ -416,27 +410,26 @@ const movePlatforms = (arr) => {
             platform.renderObject()
             //this moves truck with platform
             //*****  BUG ALERT  ***** => TRUCK STOPS AT EDGES OF SCREEN BUT WON'T SLIDE IF SWITCHING PLATFORMS
-            if (detectHit(truck, platform)) {
+            if (detectHit(truck.createImage(), platform)) {
                 //this keeps truck from going off screen
-                if (truck.x < 0 || truck.x > 850) {
+                if (truck.createImage().x < 0 || truck.createImage().x > 850) {
                     return null
                 } else {
-                    truck.clearObject()
-                    moveObjectLeftOrRight(truck)
-                    truck.renderObject()
+                    truck.createImage().clearObject()
+                    moveObjectLeftOrRight(truck.createImage())
+                    truck.createImage().renderObject()
                 }
             }
         }
     })
     //if truck isn't on any platform, detectHit for water
-    if (truck.y < 510 && arr.every(platform => !detectHit(truck, platform))) {
-        detectHit(truck, water)
+    if (truck.createImage().y < 510 && arr.every(platform => !detectHit(truck.createImage(), platform))) {
+        detectHit(truck.createImage(), water)
     }
     if (arr.length > 20) {
         arr.shift()
     }
 }
-
 
 const makeGoldFrogInWater = () => {
     possibleLaneArray = [60, 160, 260, 360, 460]
@@ -473,7 +466,7 @@ const moveGoldFrogsInWater = (arr) => {
             moveObjectLeftOrRight(frog)
             frog.renderObject()
             //this will automatically add to score because of conditions if hitTest is true
-            detectHit(truck, frog)
+            detectHit(truck.createImage(), frog)
         }
     })
     // arr = arr.filter(frog => {
@@ -510,7 +503,7 @@ waterButton.addEventListener('click', () => {
     levelOne = false
     levelTwo = true
     currentScore = 2000
-    lives = 3
+    lives = 5
     showScore()
     drawTruck()
     // clearInterval(displayDashes)
@@ -518,20 +511,6 @@ waterButton.addEventListener('click', () => {
     makeWaterLanes()
     createIntervalsLevelTwo()
 })
-
-
-// ********* LEVEL 3 STUFF *************
-
-//HAVE THE ENTIRE CANVAS FILL WITH A TUNNEL-ISH COLOR (TAN?)
-//HAVE 2 LANES WORTH OF BLACK COME DOWN
-//RANDOMIZE WHETHER THE BLACK MOVES LEFT OR RIGHT
-//SPEED UP HOW FAST IT MOVES AS POINTS INCREASE
-//SET INTERVAL FOR POINTS INCREMENTING?
-
-
-
-
-
 
 
 

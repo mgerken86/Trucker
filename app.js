@@ -43,7 +43,45 @@ class Object {
     clearObject() {
         this.ctx.clearRect(this.x, this.y, this.width, this.height)
     }
+}
 
+class ImageArt {
+    constructor(ctx, src, x, y, width, height){
+        this.ctx = ctx
+        this.src = src
+        this.x = x
+        this.y = y
+        this.width = width
+        this.height = height
+    }
+    createImage() {
+        let img = new Image()
+        img.src = this.src
+        img.onload = () => {
+            this.ctx.drawImage(img, this.x, this.y, this.width, this.height)
+        }
+    }
+    clearObject() {
+        this.ctx.clearRect(this.x, this.y, this.width, this.height)
+    }
+}
+let truck = new ImageArt(ctx, 'images/Truck-birds-eye.png', canvas.width / 2 - 25, canvas.height - 140, 50, 100)
+truck.createImage()
+// truck.src = 'images/Truck-birds-eye.png'
+// truck.addEventListener('load', (e) => {
+//     ctx.drawImage(truck, 100, 100, 50, 100)
+// })
+
+console.log(truck)
+
+// //to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
+// let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100, )
+// //made this as a function to setInterval on it to minimize the lane lines carving into the truck
+const drawTruck = () => {
+    truck.clearObject()
+    truck.x = canvas.width / 2 - 25
+    truck.y = canvas.height - 140
+    truck.createImage()
 }
 
 const makeLanes = () => {
@@ -95,7 +133,7 @@ function detectHit(obj1, obj2) {
         if (obj2.color === 'purple') {
             return true
         } else {
-            if (obj2.color === 'green' ||
+            if (obj2.height === 80 ||
                 obj2.color === 'blue') {
                 obj2.clearObject()
                 if (levelOne) {
@@ -118,7 +156,7 @@ function detectHit(obj1, obj2) {
                 }
             }
         }
-        if (obj2.color === 'gold') {
+        if (obj2.height === 50) {
             currentScore += 100
             if (levelOne) {
                 //remove touched goldFrog from array to keep it from re-rendering with the setInterval
@@ -169,7 +207,7 @@ const makeFrog = () => {
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //frog with random x axis
-    frog = new Object(possibleLaneArray[randomIndex] - 25, -100, ctx, 'green', 50, 40)
+    frog = new ImageArt(ctx, 'images/angry-boy.png', possibleLaneArray[randomIndex] - 40, -100, 80, 80)
     //push frog object into array
     frogArr.push(frog)
 }
@@ -178,7 +216,7 @@ const makeGoldenFrog = () => {
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //put this one on ctx2 to be behind other frogs 
-    goldFrog = new Object(possibleLaneArray[randomIndex] - 15, -100, ctxTwo, 'gold', 30, 50)
+    goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', possibleLaneArray[randomIndex] - 25, -100, 50, 50)
     goldFrogArr.push(goldFrog)
     //each frog in array gets an interval to have it 'rain' down. 
 }
@@ -189,7 +227,7 @@ const makeRain = (arr, distance) => {
         if (arr.length > 0) {
             arr[i].clearObject()
             arr[i].y += distance
-            arr[i].renderObject()
+            arr[i].createImage()
             //This boots frog out of array when they've gone off screen
             if (arr[i].y > 800) {
                 arr.shift()
@@ -198,15 +236,7 @@ const makeRain = (arr, distance) => {
     }
 }
 
-//to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
-let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
-//made this as a function to setInterval on it to minimize the lane lines carving into the truck
-const drawTruck = () => {
-    truck.clearObject()
-    truck.x = canvas.width / 2 - 25
-    truck.y = canvas.height - 140
-    truck.renderObject()
-}
+
 
 
 // ********* MOVING THE TRUCK WITH USER INPUTS ********************
@@ -249,7 +279,7 @@ const moveTruck = (e) => {
             break
     }
     //render truck with new coordinates
-    truck.renderObject()
+    truck.createImage()
 }
 window.addEventListener('keydown', moveTruck)
 
@@ -308,7 +338,7 @@ const resetGame = () => {
     showScore()
     if (levelOne) clearAllIntervalsLevelOne()
     if (levelTwo) clearAllIntervalsLevelTwo()
-    truck.renderObject()
+    truck.createImage()
 }
 
 
@@ -417,7 +447,7 @@ const movePlatforms = (arr) => {
                 } else {
                     truck.clearObject()
                     moveObjectLeftOrRight(truck)
-                    truck.renderObject()
+                    truck.createImage()
                 }
             }
         }
@@ -450,7 +480,7 @@ const makeGoldFrogInWater = () => {
 const moveGoldFrogsInWater = (arr) => {
     distance = 2
     arr.forEach(frog => {
-        frog.renderObject()
+        frog.createImage()
         if (arr.length > 0) {
             frog.clearObject()
             //this moves some platforms right, some platforms left
@@ -464,7 +494,7 @@ const moveGoldFrogsInWater = (arr) => {
                 }
             }
             moveObjectLeftOrRight(frog)
-            frog.renderObject()
+            frog.createImage()
             //this will automatically add to score because of conditions if hitTest is true
             detectHit(truck, frog)
         }
@@ -486,7 +516,7 @@ startBtn.addEventListener('click', (e) => {
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
     makeLanes()
-    drawTruck()
+    // drawTruck()
     showScore()
     createIntervalsLevelOne()
 })

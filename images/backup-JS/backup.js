@@ -5,14 +5,18 @@ window.onload = (e) => {
     makeLanes()
 }
 
+
+
 //I use multiple canvases to prevent them from 'cutting' into each other when crossing over on same canvas and to adjust z-index
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
 const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
-
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button')
+
+
+let truck
 let goldFrogArr = []
 let goldFrogInWaterArr = []
 let frogArr = []
@@ -43,7 +47,6 @@ class Object {
     clearObject() {
         this.ctx.clearRect(this.x, this.y, this.width, this.height)
     }
-
 }
 
 const makeLanes = () => {
@@ -199,13 +202,17 @@ const makeRain = (arr, distance) => {
 }
 
 //to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
-let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
+// let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
 //made this as a function to setInterval on it to minimize the lane lines carving into the truck
 const drawTruck = () => {
-    truck.clearObject()
-    truck.x = canvas.width / 2 - 25
-    truck.y = canvas.height - 140
-    truck.renderObject()
+    truck = new Image()
+    truck.src = "images/Truck-birds-eye.png"
+    ctx.drawImage(truck, canvas.width / 2 - 25, canvas.height - 140, 50, 100)
+
+    // truck.clearObject()
+    // truck.x = canvas.width / 2 - 25
+    // truck.y = canvas.height - 140
+    // truck.renderObject()
 }
 
 
@@ -213,7 +220,8 @@ const drawTruck = () => {
 //assign direction arrow inputs to car => each left and right shifts over one lane
 const moveTruck = (e) => {
     //immediately clear out the 'old' truck
-    truck.clearObject()
+    truck.clearImage()
+    console.log(e.key)
     switch (e.key) {
         case 'ArrowRight':
             if (levelTwo) {
@@ -222,7 +230,7 @@ const moveTruck = (e) => {
                 truck.x < 825 ? truck.x += 100 : null
             }
             break
-        case 'ArrowLeft':
+        case "ArrowLeft":
             if (levelTwo) {
                 truck.x > 25 ? truck.x -= 25 : null
             } else {
@@ -249,7 +257,7 @@ const moveTruck = (e) => {
             break
     }
     //render truck with new coordinates
-    truck.renderObject()
+    truck.drawImage()
 }
 window.addEventListener('keydown', moveTruck)
 
@@ -331,7 +339,6 @@ const makeWaterLanes = () => {
         lane.renderObject()
     })
 }
-
 const preventDoublesArray = []
 let usePreventDoubles = false
 let possiblePlatformCoordinates = [60, 160, 260, 360, 460]
@@ -379,12 +386,11 @@ const makePlatforms = () => {
 
 }
 
+
 const movePlatforms = (arr) => {
     showScore()
     distance = 1
-
     if (currentScore >= 3000) {
-        clearInterval(platformsInterval)
         distance = 3
         finishLine = new Object(0, 0, ctxTwo, 'gold', canvas.width + 12, 13)
         finishLine.renderObject()
@@ -392,7 +398,6 @@ const movePlatforms = (arr) => {
         if (currentScore >= 2500) {
             distance = 2
         }
-
     arr.forEach(platform => {
         platform.renderObject()
         if (arr.length > 0) {
@@ -431,6 +436,7 @@ const movePlatforms = (arr) => {
         arr.shift()
     }
 }
+
 
 const makeGoldFrogInWater = () => {
     possibleLaneArray = [60, 160, 260, 360, 460]
@@ -504,7 +510,7 @@ waterButton.addEventListener('click', () => {
     levelOne = false
     levelTwo = true
     currentScore = 2000
-    lives = 5
+    lives = 3
     showScore()
     drawTruck()
     // clearInterval(displayDashes)
@@ -512,6 +518,20 @@ waterButton.addEventListener('click', () => {
     makeWaterLanes()
     createIntervalsLevelTwo()
 })
+
+
+// ********* LEVEL 3 STUFF *************
+
+//HAVE THE ENTIRE CANVAS FILL WITH A TUNNEL-ISH COLOR (TAN?)
+//HAVE 2 LANES WORTH OF BLACK COME DOWN
+//RANDOMIZE WHETHER THE BLACK MOVES LEFT OR RIGHT
+//SPEED UP HOW FAST IT MOVES AS POINTS INCREASE
+//SET INTERVAL FOR POINTS INCREMENTING?
+
+
+
+
+
 
 
 

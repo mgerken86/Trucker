@@ -598,32 +598,35 @@ const changeThingsAsPointsIncrease = (currentScore) => {
         if (currentScore === 2000) {
             alert('YOU WIN!!!! On to the next Level!')
             resetGame()
-        } else
-            //these make frogs faster as their speed gets quicker to keep the number of obstacles a similar density
-            if (currentScore === 1500) {
-                h1.innerText = `Things are speeding up!!`
-                setTimeout(() => h1.innerText = '', 1300)
-            }
-        if (currentScore >= 1500) {
+        } 
+        if (currentScore === 1500) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
+        }
+        if (currentScore === 1000) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
+        }
+        if (currentScore === 500) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
+        }
+            //these make frogs faster as their speed gets quicker to keep the number of obstacles a similar density 
+        
+            if (currentScore >= 1500) {
             clearInterval(frogsRainingDown)
             frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
             clearInterval(frogTimer)
             frogTimer = setInterval(makeFrog, 100)
-        } else
-            if (currentScore === 1000) {
-                h1.innerText = `Things are speeding up!!`
-                setTimeout(() => h1.innerText = '', 1300)
-            }
+        } else 
+
         if (currentScore >= 1000) {
             clearInterval(frogsRainingDown)
             frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
             clearInterval(frogTimer)
             frogTimer = setInterval(makeFrog, 150)
         } else
-            if (currentScore === 500) {
-                h1.innerText = `Things are speeding up!!`
-                setTimeout(() => h1.innerText = '', 1300)
-            }
+            
         if (currentScore >= 500) {
             clearInterval(frogsRainingDown)
             frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
@@ -752,7 +755,7 @@ const showButtons = () => {
     startBtn.className = ''
     waterButton.className = ''
     tunnelButton.className = ''
-    setTimeout(() => h1.innerText = 'TRUCKER: Smash the Frogs!', 1000)
+    setTimeout(() => h1.innerText = 'TRUCKER: Smash the Frogs!', 1400)
 }
 
 const resetGame = () => {
@@ -775,6 +778,8 @@ const resetGame = () => {
         ctxFour.clearRect(0, 0, canvas.width, canvas.height)
         canvasFour.className = ''
         scoreboard.textContent = ``
+        //have this here again because level 3 keeps erasing h1 text after GameOver
+        setTimeout(() => h1.innerText = 'TRUCKER: Smash the Frogs!', 1300)
     }, 100)
 
     levelOne = false
@@ -793,7 +798,7 @@ const resetGame = () => {
 
 startBtn.addEventListener('click', (e) => {
     hideButtons()
-    h1.innerText = `TRUCK GOLD FROGS TO REACH 2000 POINTS!!`
+    h1.innerText = `SMASH GOLD FROGS TO REACH 2000 POINTS!!`
     setTimeout(() => h1.innerText = '', 2500)
     currentScore = 0
     lives = 3
@@ -819,7 +824,7 @@ startBtn.addEventListener('click', (e) => {
 
 waterButton.addEventListener('click', () => {
     hideButtons()
-    h1.innerText = `TRUCK GOLD FROGS UNTIL FINISH LINE APPEARS!!`
+    h1.innerText = `SMASH GOLD FROGS UNTIL FINISH LINE APPEARS!!`
     setTimeout(() => h1.innerText = '', 2500)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
@@ -838,7 +843,7 @@ waterButton.addEventListener('click', () => {
 
 tunnelButton.addEventListener('click', () => {
     hideButtons()
-    h1.innerText = `TRUCK GOLD FROGS TO REACH 6000 POINTS!!`
+    h1.innerText = `SMASH GOLD FROGS TO REACH 6000 POINTS!!`
     setTimeout(() => h1.innerText = '', 2500)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)

@@ -16,6 +16,7 @@ const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasTh
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button')
+const h1 = document.querySelector('h1')
 
 //the empty arrays are where I put objects once I make them, and then run intervals on the whole array
 let goldFrogArr = []
@@ -718,17 +719,18 @@ const hideButtons = () => {
     startBtn.classList.add('hide')
     waterButton.classList.add('hide')
     tunnelButton.classList.add('hide')
+    h1.classList.add('hide')
 }
 const showButtons = () => {
     startBtn.className = ''
     waterButton.className = ''
     tunnelButton.className = ''
+    h1.className = ''
 }
 
 const resetGame = () => {
     currentScore = 0
     lives = 3
-    scoreboard.textContent = ``
     showButtons()
 
     if (levelOne) {
@@ -745,6 +747,7 @@ const resetGame = () => {
         ctxThree.clearRect(0, 0, canvas.width, canvas.height)
         ctxFour.clearRect(0, 0, canvas.width, canvas.height)
         canvasFour.className = ''
+        scoreboard.textContent = ``
     }, 100)
 
     levelOne = false

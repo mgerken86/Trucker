@@ -31,6 +31,9 @@ body {
 h1 {
     font-size: 80px;
 }
+h1.hide {
+    display: none
+}
 
 button {
     padding: 20px 60px;

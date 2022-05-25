@@ -10,7 +10,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: black;
-    color: white;
+    color: #00ff00;
 }
 
 h1 {
@@ -20,6 +20,9 @@ h1 {
 button {
     padding: 20px 60px;
     font-size: 30px;
+    font-weight: bold;
+    color: black;
+    background-color: #00ff00;
 }
 
 #canvas {
@@ -32,11 +35,25 @@ button {
 #canvas-three {
     z-index: 3;
 }
-#canvas-four {
+#canvas-four.levelOne {
     background-color: darkgray;
     z-index: 2;
     border-left: 12px solid white;
     border-right: 12px solid white;
+}
+
+#canvas-four.levelTwo {
+    background-color: gray;
+    z-index: 2;
+    border-left: 12px solid white;
+    border-right: 12px solid white;
+}
+
+#canvas-four.levelThree {
+    background-color: black;
+    z-index: 2;
+    border: none
+   
 }
 
 .canvas-container {
@@ -53,5 +70,5 @@ button {
 #scoreboard {
     font-size: 80px;
     bottom: 0;
-    color: white;
+    color: #00ff00;
 }

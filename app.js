@@ -95,7 +95,7 @@ class ImageArt {
 // ************************************************************
 function detectHit(obj1, obj2) {
     let hitTest
-    if (obj2.color !== 'darkgray') {
+    if (obj2.color !== 'black') {
         hitTest =
             obj1.y + obj1.height > obj2.y &&
             obj1.y < obj2.y + obj2.height &&
@@ -522,7 +522,7 @@ const makeTunnelOpening = () => {
         275, 300, 325, 350, 375, 400, 425, 450, 475, 500,
         525, 550, 575, 600, 625, 650, 675, 700, 725, 750]
     tunnelX = possibleXCoordinates[i]
-    opening = new Object(tunnelX, -25, ctxThree, 'darkgray', 150, 100)
+    opening = new Object(tunnelX, -25, ctxThree, 'black', 150, 100)
     openingArr.push(opening)
 
     //if truck isn't inside any of the openings, detectHit() for tunnel bricks
@@ -717,7 +717,7 @@ const clearAllIntervalsLevelThree = () => {
 const resetGame = () => {
     currentScore = 0
     lives = 3
-    showScore()
+    scoreboard.textContent = ``
 
     if (levelOne) {
         clearAllIntervalsLevelOne()
@@ -732,6 +732,7 @@ const resetGame = () => {
         ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
         ctxThree.clearRect(0, 0, canvas.width, canvas.height)
         ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+        canvasFour.className = ''
     }, 100)
 
     levelOne = false
@@ -755,6 +756,7 @@ startBtn.addEventListener('click', (e) => {
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    canvasFour.classList.add('levelOne')
     makeLanes()
     drawTruck()
     showScore()
@@ -775,6 +777,7 @@ waterButton.addEventListener('click', () => {
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    canvasFour.classList.add('levelTwo')
     goldFrogArr.length = 0
     currentScore = 2000
     lives = 3
@@ -790,6 +793,7 @@ tunnelButton.addEventListener('click', () => {
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    canvasFour.classList.add('levelThree')
     drawTruck()
     lives = 3
     showScore()

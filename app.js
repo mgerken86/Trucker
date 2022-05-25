@@ -142,7 +142,6 @@ function detectHit(obj1, obj2) {
                     clearAllIntervalsLevelThree()
                     createIntervalsLevelThree()
                     setTimeout(() => {
-                        
                         changeThingsAsPointsIncrease(currentScore)
                     }, 500)
 
@@ -714,10 +713,23 @@ const clearAllIntervalsLevelThree = () => {
         goldFrogArr.length = 0
     }, 1);
 }
+
+const hideButtons = () => {
+    startBtn.classList.add('hide')
+    waterButton.classList.add('hide')
+    tunnelButton.classList.add('hide')
+}
+const showButtons = () => {
+    startBtn.className = ''
+    waterButton.className = ''
+    tunnelButton.className = ''
+}
+
 const resetGame = () => {
     currentScore = 0
     lives = 3
     scoreboard.textContent = ``
+    showButtons()
 
     if (levelOne) {
         clearAllIntervalsLevelOne()
@@ -750,6 +762,7 @@ const resetGame = () => {
 // ************************************************************
 
 startBtn.addEventListener('click', (e) => {
+    hideButtons()
     currentScore = 0
     lives = 3
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -773,6 +786,7 @@ startBtn.addEventListener('click', (e) => {
 })
 
 waterButton.addEventListener('click', () => {
+    hideButtons()
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
@@ -789,6 +803,7 @@ waterButton.addEventListener('click', () => {
 })
 
 tunnelButton.addEventListener('click', () => {
+    hideButtons()
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)

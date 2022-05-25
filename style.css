@@ -40,6 +40,10 @@ button {
     background-color: #00ff00;
 }
 
+button.hide {
+    display: none;
+}
+
 #canvas {
     background-color: rgba(255,255,255,0);
     z-index: 6;

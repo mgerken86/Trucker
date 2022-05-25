@@ -160,55 +160,7 @@ function detectHit(obj1, obj2) {
                 }
             }
             obj2.clearObject()
-            if (levelOne) {
-                //remove touched goldFrog from array to keep it from re-rendering with the setInterval
-                // goldFrogArr.splice()
-                // obj2.clearObject()
-                if (currentScore === 2000) {
-                    alert('YOU WIN!!!! On to the next Level!')
-                    resetGame()
-                } else
-                    //these make frogs faster as their speed gets quicker to keep the number of obstacles a similar density
-                    if (currentScore >= 1500) {
-                        clearInterval(frogsRainingDown)
-                        frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
-                        clearInterval(frogTimer)
-                        frogTimer = setInterval(makeFrog, 100)
-                    } else
-                        if (currentScore >= 1000) {
-                            clearInterval(frogsRainingDown)
-                            frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
-                            clearInterval(frogTimer)
-                            frogTimer = setInterval(makeFrog, 150)
-                        } else
-                            if (currentScore >= 500) {
-                                clearInterval(frogsRainingDown)
-                                frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
-                                clearInterval(frogTimer)
-                                frogTimer = setInterval(makeFrog, 225)
-                            }
-            }
-            if (levelTwo) {
-                //this was the only way I could remove the specific gold frog
-                for (let i = 0; i < goldFrogInWaterArr.length; i++) {
-                    if (goldFrogInWaterArr[i] === obj2) {
-                        console.log(`This is the frog: ${goldFrogInWaterArr[i]} at index: ${i}}`)
-                        goldFrogInWaterArr.splice(i, 1)
-                    }
-                }
-                obj2.clearObject()
-            }
-            if (levelThree) {
-                // clearInterval(moveGoldFrogsInterval)
-                // moveGoldFrogsInterval = setInterval(moveTunnel, 40, goldFrogArr, 20)
-                
-                
-                setTimeout(() => {
-                    obj2.clearObject()
-                    // ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
-                }, 50)
-            }
-            showScore()
+            changeThingsAsPointsIncrease(currentScore)
         }
     }
 }
@@ -432,7 +384,6 @@ const makePlatforms = () => {
 
     platform = new ImageArt(ctxThree, 'images/dead-boy.png', x, y - 50, 150, 100)
     platformArr.push(platform)
-
 }
 
 const movePlatforms = (arr) => {
@@ -609,7 +560,57 @@ const moveTunnel = (arr, distance) => {
 //    --------======== INTERVALS AND RESETTING GAME ========---------
 
 // ************************************************************
+const changeThingsAsPointsIncrease = (currentScore) => {
+    if (levelOne) {
+        //remove touched goldFrog from array to keep it from re-rendering with the setInterval
+        // goldFrogArr.splice()
+        // obj2.clearObject()
+        if (currentScore === 2000) {
+            alert('YOU WIN!!!! On to the next Level!')
+            resetGame()
+        } else
+            //these make frogs faster as their speed gets quicker to keep the number of obstacles a similar density
+            if (currentScore >= 1500) {
+                clearInterval(frogsRainingDown)
+                frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
+                clearInterval(frogTimer)
+                frogTimer = setInterval(makeFrog, 100)
+            } else
+                if (currentScore >= 1000) {
+                    clearInterval(frogsRainingDown)
+                    frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
+                    clearInterval(frogTimer)
+                    frogTimer = setInterval(makeFrog, 150)
+                } else
+                    if (currentScore >= 500) {
+                        clearInterval(frogsRainingDown)
+                        frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
+                        clearInterval(frogTimer)
+                        frogTimer = setInterval(makeFrog, 225)
+                    }
+    }
+    if (levelTwo) {
+        //this was the only way I could remove the specific gold frog
+        for (let i = 0; i < goldFrogInWaterArr.length; i++) {
+            if (goldFrogInWaterArr[i] === obj2) {
+                console.log(`This is the frog: ${goldFrogInWaterArr[i]} at index: ${i}}`)
+                goldFrogInWaterArr.splice(i, 1)
+            }
+        }
+        obj2.clearObject()
+    }
+    if (levelThree) {
+        // clearInterval(moveGoldFrogsInterval)
+        // moveGoldFrogsInterval = setInterval(moveTunnel, 40, goldFrogArr, 20)
 
+
+        setTimeout(() => {
+            obj2.clearObject()
+            // ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+        }, 50)
+    }
+    showScore()
+}
 
 const createIntervalsLevelOne = () => {
     levelOne = true
@@ -671,7 +672,7 @@ const createIntervalsLevelThree = () => {
     makeTunnelInterval = setInterval(makeTunnel, 200)
     moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
     makeOpeningInterval = setInterval(makeTunnelOpening, 30)
-    moveOpeningInterval = setInterval(moveTunnel, 4, openingArr,2)
+    moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 2)
     moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
 }
 

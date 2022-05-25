@@ -19,7 +19,9 @@ let goldFrogInWaterArr = []
 let frogArr = []
 let platformArr = []
 let tunnelArr = []
-const openingArr = []
+let openingArr = []
+let tunnelDashes = []
+
 let currentScore = 0
 let lives = 3
 let levelOne = true
@@ -131,32 +133,41 @@ const makeLaneDashes = () => {
 
 // *********** HIT TEST AND THE EFFECTS OF VARIOUS CONDITIONS AFTER A HIT ************
 function detectHit(obj1, obj2) {
-    // if (obj2.color !== 'darkgray') {
-        let hitTest =
+    let hitTest
+    if (obj2.color !== 'darkgray') {
+        hitTest =
             obj1.y + obj1.height > obj2.y &&
             obj1.y < obj2.y + obj2.height &&
             obj1.x + obj1.width > obj2.x &&
             obj1.x < obj2.x + obj2.width
-    // } else {
-    //     //this hitTest makes sure truck is entirely in tunnel on level 3
-    //     hitTest =
-    //         obj1.y + obj1.height > obj2.y &&
-    //         obj1.y < obj2.y + obj2.height &&
-    //         obj1.x + obj1.width > obj2.x &&
-    //         obj1.x + obj1.width < obj2.x + obj2.width
-    // }
+    } else {
+        // console.log('in the tunnel')
+        //this hitTest is more strict to make level 3 tunnel harder
+        hitTest =
+            obj1.y + obj1.height > obj2.y &&
+            obj1.y < obj2.y + obj2.height &&
+            obj1.x > obj2.x &&
+            obj1.x + obj1.width < obj2.x + obj2.width
+    }
     if (hitTest) {
         if (obj2.width === 150 ||
             obj2.width === 200) {
             return true
         } else {
+            showScore()
+            if (lives === 0) {
+                alert('Game Over, you lose!!')
+                resetGame()
+            }
             //using height of 'bad' frogs to make conditions for them, color of water, and height of tunnel bricks
             if (obj2.height === 80 ||
                 obj2.color === 'blue' ||
                 obj2.height === 100) {
+                    //subtract a life for the baddies
+                lives--
                 obj2.clearObject()
                 if (levelOne) {
-                    //this is to give a quick reset so frogs don't immediately fly down and take another life
+                    //this is to give a reset so frogs don't immediately fly down and take another life
                     clearAllIntervalsLevelOne()
                     createIntervalsLevelOne()
                     drawTruck()
@@ -168,21 +179,28 @@ function detectHit(obj1, obj2) {
                     makeWater()
                     drawTruck()
                 }
-                lives--
-                
-                showScore()
-                if (lives === 0) {
-                    alert('Game Over, you lose!!')
-                    resetGame()
+                if (levelThree) {
+                    //this resets tunnel so it doesn't repeatedly kill player
+                    clearAllIntervalsLevelThree()
+                    createIntervalsLevelThree()
+                    drawTruck()
+                    //this is to start tunnel openings in middle of tunnel after player dies
+                    return i = 16
                 }
             }
         }
         //using height of gold frogs to create conditions for them
         if (obj2.height === 50) {
             currentScore += 100
+            //remove specific truthy HitTest gold from from array
+            for (let i = 0; i < goldFrogArr.length; i++) {
+                if (goldFrogArr[i] === obj2) {
+                    goldFrogArr.splice(i, 1)
+                }
+            }
             if (levelOne) {
                 //remove touched goldFrog from array to keep it from re-rendering with the setInterval
-                goldFrogArr.shift()
+                // goldFrogArr.splice()
                 obj2.clearObject()
                 if (currentScore === 2000) {
                     alert('YOU WIN!!!! On to the next Level!')
@@ -310,6 +328,9 @@ window.addEventListener('keydown', moveTruck)
 
 // ******** BELOW ARE THE FUNCTIONS TO ADD/REMOVE INTERVALS AND TO RESET GAME *****
 const createIntervalsLevelOne = () => {
+    levelOne = true
+    levelTwo = false
+    levelThree = false
     frogTimer = setInterval(makeFrog, 300)
     frogTimer2 = setInterval(makeGoldenFrog, 2000)
     frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
@@ -334,6 +355,9 @@ const clearAllIntervalsLevelOne = () => {
 }
 
 const createIntervalsLevelTwo = () => {
+    levelOne = false
+    levelTwo = true
+    levelThree = false
     platformsInterval = setInterval(makePlatforms, 1000)
     movingPlatformsInterval = setInterval(movePlatforms, 10, platformArr)
     makingGoldFrogsInterval = setInterval(makeGoldFrogInWater, 1500)
@@ -356,10 +380,14 @@ const clearAllIntervalsLevelTwo = () => {
 }
 
 const createIntervalsLevelThree = () => {
-    makeTunnelInterval = setInterval(makeTunnel, 250)
-    moveTunnelInterval = setInterval(moveTunnel, 100, tunnelArr, 20)
-    makeOpeningInterval = setInterval(makeTunnelOpening, 20)
-    moveOpeningInterval = setInterval(moveTunnel, 40, openingArr, 15)
+    levelOne = false
+    levelTwo = false
+    levelThree = true
+    makeTunnelInterval = setInterval(makeTunnel, 150)
+    moveTunnelInterval = setInterval(moveTunnel, 50, tunnelArr, 20)
+    makeOpeningInterval = setInterval(makeTunnelOpening, 30)
+    moveOpeningInterval = setInterval(moveTunnel, 40, openingArr, 20)
+    moveGoldFrogsInterval = setInterval(moveTunnel, 40, goldFrogArr, 20)
 }
 
 const clearAllIntervalsLevelThree = () => {
@@ -367,14 +395,19 @@ const clearAllIntervalsLevelThree = () => {
     clearInterval(moveTunnelInterval)
     clearInterval(makeOpeningInterval)
     clearInterval(moveOpeningInterval)
+    clearInterval(moveGoldFrogsInterval)
     tunnelArr.forEach(brick => {
         brick.clearObject()
     })
     openingArr.forEach(opening => {
         opening.clearObject()
     })
+    goldFrogArr.forEach(frog => {
+        frog.clearObject()
+    })
     tunnelArr.length = 0
     openingArr.length = 0
+    goldFrogArr.length = 0
 }
 const resetGame = () => {
     currentScore = 0
@@ -550,13 +583,96 @@ const moveGoldFrogsInWater = (arr) => {
     // })
 }
 
+// *********** LEVEL THREE!!!!!! ***********
+
+const makeTunnel = () => {
+    tunnel = new ImageArt(ctxFour, 'images/bricks.png', 0, -100, canvas.width, 100)
+    tunnel.createImage()
+    tunnelArr.push(tunnel)
+}
+//     if (arr === openingArr){
+//         if (arr.every(opening => {
+//             detectHit(truck, opening)
+//         })) {
+//             detectHit(truck, tunnel)
+//         }
+// }
+
+// i chooses the lane that the opening will be in. it starts in the middle and either stays the same for next opening or is one more or one less in coordinates array
+let i = 16
+//when counter reaches (x), a gold frog will be made at same coordinates as opening and will have setInterval to come down at same speed
+let counter = 0
+
+const makeTunnelOpening = () => {
+    console.log(i)
+    // ***** AFTER SO MANY POINTS, MAKE TUNNEL OPENING SMALLER ********
+    possibleXCoordinates = [0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250,
+        275, 300, 325, 350, 375, 400, 425, 450, 475, 500,
+        525, 550, 575, 600, 625, 650, 675, 700, 725, 750]
+    tunnelX = possibleXCoordinates[i]
+    opening = new Object(tunnelX, -25, ctxTwo, 'darkgray', 150, 100)
+    openingArr.push(opening)
+
+    //if truck isn't inside any of the openings, detectHit() for tunnel bricks
+    if (openingArr.every(opening => !detectHit(truck, opening))) {
+        tunnelArr.forEach(brick => {
+            detectHit(truck, brick)
+        })
+        //this keeps the opening from starting on an end if user loses a life and resets in middle  
+    }
+    //This makes i only stay the same or change by 1 to keep openings next to each other
+    iIncrements = [0, -1, 1]
+    randomIndex = Math.floor(Math.random() * iIncrements.length)
+    //these conditions keep openings from going off screen
+    if (tunnelX === 0) {
+        i += 1
+    } else if (tunnelX === 750) {
+        i -= 1
+    } else {
+        i += iIncrements[randomIndex]
+    }
+    counter++
+    if (counter === 50) {
+        goldFrog = new ImageArt(ctx, 'images/Gold-boy.png', tunnelX + 25, -25, 50, 50)
+        goldFrogArr.push(goldFrog)
+        return counter = 0
+    }
+
+
+    //this chooses how the x coordinates will change or stay the same the next time function is called
+    return i
+}
+
+
+
+
+
+
+const moveTunnel = (arr, distance) => {
+    arr.forEach(opening => {
+        opening.clearObject()
+        opening.y += distance
+        if (arr === goldFrogArr) {
+            detectHit(truck, opening)
+        }
+        //this makes the tunnel/frogs create Image or the openings render
+        arr === tunnelArr || arr === goldFrogArr ? opening.createImage() : opening.renderObject()
+        if (opening.y > 800) {
+            // clearInterval(moveTunnelInterval)
+            // arr.length = 0
+            arr.shift()
+        }
+    })
+}
+
+
+
+
 
 // ****** EVENT LISTENERS FOR BUTTONS *******
 
 startBtn.addEventListener('click', (e) => {
     score = 0
-    levelOne = true
-    levelTwo = false
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
@@ -567,19 +683,14 @@ startBtn.addEventListener('click', (e) => {
     createIntervalsLevelOne()
 })
 
-
-
-
 waterButton.addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
     goldFrogArr.length = 0
-    levelOne = false
-    levelTwo = true
     currentScore = 2000
-    lives = 5
+    lives = 3
     showScore()
     drawTruck()
     // clearInterval(displayDashes)
@@ -588,72 +699,16 @@ waterButton.addEventListener('click', () => {
     createIntervalsLevelTwo()
 })
 
-
-
-// *********** LEVEL THREE!!!!!! ***********
-
-const makeTunnel = () => {
-    tunnel = new ImageArt(ctxFour, 'images/bricks.png', 0, -100, canvas.width, 100)
-    tunnel.createImage()
-    tunnelArr.push(tunnel)
-}
-const moveTunnel = (arr, distance) => {
-    arr.forEach(opening => {
-        opening.clearObject()
-        opening.y += distance
-        //this makes the tunnel itself or the openings render
-        arr === tunnelArr ? opening.createImage() : opening.renderObject()
-        if (opening.y > 800) {
-            // clearInterval(moveTunnelInterval)
-            // arr.length = 0
-            arr.shift()
-        }
-    })
-        if (arr === openingArr){
-            arr.every(opening => !detectHit(truck, opening)) ? tunnelArr.forEach(brick => {detectHit(truck, brick)}) : null
-        }
-
-
-
-    //     if (arr === openingArr){
-    //         if (arr.every(opening => {
-    //             detectHit(truck, opening)
-    //         })) {
-    //             detectHit(truck, tunnel)
-    //         }
-    // }
-}
-let i = 16
-const makeTunnelOpening = () => {
-    possibleXCoordinates = [0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750]
-    tunnelX = possibleXCoordinates[i]
-    iIncrements = [0, -1, 1]
-    opening = new Object(tunnelX, -25, ctxTwo, 'darkgray', 150, 100)
-    openingArr.push(opening)
-    randomIndex = Math.floor(Math.random() * iIncrements.length)
-    if (tunnelX === 0) {
-        i += 1
-    } else if (tunnelX === 750) {
-        i -= 1
-    } else {
-        i += iIncrements[randomIndex]
-    }
-    return i
-}
 tunnelButton.addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
     drawTruck()
-    levelOne = false
-    levelTwo = false
-    levelThree = true
-    lives = 1
+    lives = 3
     showScore()
     createIntervalsLevelThree()
 })
-
 
 //spawn frogs that come down from x axis and come across from y axis
 //use math.random() to choose x axis

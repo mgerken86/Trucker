@@ -120,33 +120,42 @@ function detectHit(obj1, obj2) {
             if (obj2.height === 80 ||
                 obj2.color === 'blue' ||
                 obj2.height === 100) {
-                //subtract a life for the baddies
-                lives--
-                showScore()
-                if (lives === 0) {
-                    alert('Game Over, you lose!!')
-                    return resetGame()
-                }
                 obj2.clearObject()
+                
                 if (levelOne) {
                     //this is to give a reset so frogs don't immediately fly down and take another life
                     clearAllIntervalsLevelOne()
+                    obj2.clearObject()
                     createIntervalsLevelOne()
-                    drawTruck()
+                    setTimeout(changeThingsAsPointsIncrease(currentScore), 500)
                 }
                 if (levelTwo) {
                     clearAllIntervalsLevelTwo()
+                    obj2.clearObject()
+                    // createIntervalsLevelTwo()
                     createIntervalsLevelTwo()
                     //call this again b/c the water is cleared as it's the object that touches and kills truck
                     makeWater()
-                    drawTruck()
                 }
                 if (levelThree) {
                     //this resets tunnel so it doesn't repeatedly kill player
                     clearAllIntervalsLevelThree()
                     createIntervalsLevelThree()
-                    drawTruck()
+                    setTimeout(() => {
+                        
+                        changeThingsAsPointsIncrease(currentScore)
+                    }, 500)
+
                     //this is to start tunnel openings in middle of tunnel after player dies
+                }
+                lives--
+                showScore()
+                drawTruck()
+                if (lives === 0) {
+                    alert('Game Over, you lose!!')
+                    return resetGame()
+                }
+                if (levelThree) {
                     return i = 16
                 }
             }
@@ -602,6 +611,7 @@ const changeThingsAsPointsIncrease = (currentScore) => {
 
     }
     if (levelThree) {
+        
         if (currentScore >= 1000) {
             clearInterval(moveTunnelInterval)
             clearInterval(moveOpeningInterval)
@@ -702,7 +712,7 @@ const clearAllIntervalsLevelThree = () => {
         tunnelArr.length = 0
         openingArr.length = 0
         goldFrogArr.length = 0
-    }, 100);
+    }, 1);
 }
 const resetGame = () => {
     currentScore = 0
@@ -784,6 +794,7 @@ tunnelButton.addEventListener('click', () => {
     lives = 3
     showScore()
     createIntervalsLevelThree()
+    return i = 16
 })
 
 //spawn frogs that come down from x axis and come across from y axis

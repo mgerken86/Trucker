@@ -153,13 +153,22 @@ function detectHit(obj1, obj2) {
         //using height of gold frogs to create conditions for them
         if (obj2.height === 50) {
             currentScore += 100
-            //remove specific truthy HitTest gold from from array
+            //remove specific truthy HitTest gold from from array so that it doesn't keep getting Interval to come down
             for (let i = 0; i < goldFrogArr.length; i++) {
                 if (goldFrogArr[i] === obj2) {
                     goldFrogArr.splice(i, 1)
                 }
             }
-            obj2.clearObject()
+            for (let i = 0; i < goldFrogInWaterArr.length; i++) {
+                if (goldFrogInWaterArr[i] === obj2) {
+                    console.log(`This is the frog: ${goldFrogInWaterArr[i]} at index: ${i}}`)
+                    goldFrogInWaterArr.splice(i, 1)
+                }
+            }
+            setTimeout(() => {
+                obj2.clearObject()
+                // ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+            }, 50)
             changeThingsAsPointsIncrease(currentScore)
         }
     }
@@ -591,23 +600,18 @@ const changeThingsAsPointsIncrease = (currentScore) => {
     }
     if (levelTwo) {
         //this was the only way I could remove the specific gold frog
-        for (let i = 0; i < goldFrogInWaterArr.length; i++) {
-            if (goldFrogInWaterArr[i] === obj2) {
-                console.log(`This is the frog: ${goldFrogInWaterArr[i]} at index: ${i}}`)
-                goldFrogInWaterArr.splice(i, 1)
-            }
-        }
-        obj2.clearObject()
+
     }
     if (levelThree) {
-        // clearInterval(moveGoldFrogsInterval)
-        // moveGoldFrogsInterval = setInterval(moveTunnel, 40, goldFrogArr, 20)
-
-
-        setTimeout(() => {
-            obj2.clearObject()
-            // ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
-        }, 50)
+        if (currentScore >= 500) {
+            clearInterval(moveTunnelInterval)
+            clearInterval(moveOpeningInterval)
+            clearInterval(moveGoldFrogsInterval)
+            //good ratios for moving pretty quickly
+            moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
+            moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 2)
+            moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
+        }
     }
     showScore()
 }
@@ -668,12 +672,12 @@ const createIntervalsLevelThree = () => {
     levelOne = false
     levelTwo = false
     levelThree = true
-    //good ratios for moving pretty quickly
+
     makeTunnelInterval = setInterval(makeTunnel, 200)
-    moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
+    moveTunnelInterval = setInterval(moveTunnel, 2, tunnelArr, 1)
     makeOpeningInterval = setInterval(makeTunnelOpening, 30)
-    moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 2)
-    moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
+    moveOpeningInterval = setInterval(moveTunnel, 2, openingArr, 1)
+    moveGoldFrogsInterval = setInterval(moveTunnel, 2, goldFrogArr, 1)
 }
 
 const clearAllIntervalsLevelThree = () => {

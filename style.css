@@ -9,7 +9,8 @@ img {
     top: 0;
     right: 0;
     bottom: 0;
-    transform: translate(50%, 50%);
+    transform: translate(50%, 50%); 
+    margin-left: -125px;
     min-width: 50%;
   min-height: 50%;
   z-index: 1;
@@ -30,10 +31,12 @@ body {
 
 h1 {
     font-size: 80px;
+    position: fixed;
+    top: 0px;
 }
-h1.hide {
+/* h1.hide {
     display: none
-}
+} */
 
 button {
     padding: 20px 60px;
@@ -80,8 +83,8 @@ button.hide {
 
 .canvas-container {
     position: relative;
-    width: 80vw;
-    height: 80vh;
+    width: 70vw;
+    height: 70vh;
 }
 .canvas-container canvas {
     position: absolute;

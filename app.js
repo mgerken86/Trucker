@@ -5,9 +5,9 @@
 // ************************************************************
 
 //3 Sec Countdown timer until canvas starts 'moving'
-window.onload = (e) => {
-    makeLanes()
-}
+// window.onload = (e) => {
+//     makeLanes()
+// }
 
 //I use multiple canvases to prevent them from 'cutting' into each other when crossing over on same canvas and to adjust z-index
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
@@ -28,7 +28,7 @@ let tunnelDashes = []
 
 let currentScore = 0
 let lives = 3
-let levelOne = true
+let levelOne = false
 let levelTwo = false
 let levelThree = false
 
@@ -115,13 +115,13 @@ function detectHit(obj1, obj2) {
             //This is used to detect truck on platforms and in tunnel
             return true
         } else {
-            showScore()
             //using height of 'bad' frogs to make conditions for them, color of water, and height of tunnel bricks
             if (obj2.height === 80 ||
                 obj2.color === 'blue' ||
                 obj2.height === 100) {
                 //subtract a life for the baddies
                 lives--
+                showScore()
                 if (lives === 0) {
                     alert('Game Over, you lose!!')
                     resetGame()
@@ -198,46 +198,49 @@ const drawTruck = () => {
 
 //assign direction arrow inputs to car => each left and right shifts over one lane
 const moveTruck = (e) => {
-    //immediately clear out the 'old' truck
-    truck.clearObject()
-    switch (e.key) {
-        case 'ArrowRight':
-            if (levelTwo || levelThree) {
-                truck.x < 825 ? truck.x += 25 : null
-            } else {
-                truck.x < 825 ? truck.x += 100 : null
-            }
-            break
-        case 'ArrowLeft':
-            if (levelTwo || levelThree) {
-                truck.x > 25 ? truck.x -= 25 : null
-            } else {
-                //chose 25 because that's the closest it gets to the left border
-                truck.x > 25 ? truck.x -= 100 : null
-            }
-            break
-        case 'ArrowUp':
-            console.log(truck.y)
-            if (currentScore >= 3000) {
-                truck.y > 0 ? truck.y -= 100 : null
-                //How it's decided you win level 2
-                if (truck.y < 10) {
-                    alert('YOU BEAT LEVEL 2!!!')
-                    resetGame()
+    if ((levelOne) || (levelTwo) || (levelThree)) {
+        //immediately clear out the 'old' truck
+        truck.clearObject()
+        switch (e.key) {
+            case 'ArrowRight':
+                if (levelTwo || levelThree) {
+                    truck.x < 825 ? truck.x += 25 : null
+                } else {
+                    truck.x < 825 ? truck.x += 100 : null
                 }
-            } else
-                truck.y > 10 ? truck.y -= 100 : null
+                break
+            case 'ArrowLeft':
+                if (levelTwo || levelThree) {
+                    truck.x > 25 ? truck.x -= 25 : null
+                } else {
+                    //chose 25 because that's the closest it gets to the left border
+                    truck.x > 25 ? truck.x -= 100 : null
+                }
+                break
+            case 'ArrowUp':
+                console.log(truck.y)
+                if (currentScore >= 3000) {
+                    truck.y > 0 ? truck.y -= 100 : null
+                    //How it's decided you win level 2
+                    if (truck.y < 10) {
+                        alert('YOU BEAT LEVEL 2!!!')
+                        resetGame()
+                    }
+                } else
+                    truck.y > 10 ? truck.y -= 100 : null
 
-            // truck.y > 450 ? truck.y -= 100 : null
-            break
-        case 'ArrowDown':
-            truck.y < canvas.height - 140 ? truck.y += 100 : null
-            break
+                // truck.y > 450 ? truck.y -= 100 : null
+                break
+            case 'ArrowDown':
+                truck.y < canvas.height - 140 ? truck.y += 100 : null
+                break
+        }
+        //render truck with new coordinates
+        truck.createImage()
     }
-    //render truck with new coordinates
-    truck.createImage()
 }
 window.addEventListener('keydown', moveTruck)
+
 
 
 // ************************************************************
@@ -285,7 +288,9 @@ const makeLaneDashes = () => {
 }
 
 const makeFrog = () => {
-
+    console.log(levelOne)
+    console.log(levelTwo)
+    console.log(levelThree)
     //possible lane array are the middles of all of the lanes
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
@@ -563,7 +568,6 @@ const moveTunnel = (arr, distance) => {
     })
 }
 
-
 // ************************************************************
 
 //    --------======== INTERVALS AND RESETTING GAME ========---------
@@ -603,7 +607,7 @@ const changeThingsAsPointsIncrease = (currentScore) => {
 
     }
     if (levelThree) {
-        if (currentScore >= 500) {
+        if (currentScore >= 1000) {
             clearInterval(moveTunnelInterval)
             clearInterval(moveOpeningInterval)
             clearInterval(moveGoldFrogsInterval)
@@ -628,19 +632,24 @@ const createIntervalsLevelOne = () => {
 }
 
 const clearAllIntervalsLevelOne = () => {
+    levelOne = true
+    levelTwo = false
+    levelThree = false
     clearInterval(frogTimer)
     clearInterval(frogTimer2)
     clearInterval(frogsRainingDown)
     clearInterval(goldFrogsRainingDown)
     clearInterval(displayDashes)
-    frogArr.forEach(frog => {
-        frog.clearObject()
-    })
-    goldFrogArr.forEach(frog => {
-        frog.clearObject()
-    })
-    frogArr.length = 0
-    goldFrogArr.length = 0
+    setTimeout(() => {
+        frogArr.forEach(frog => {
+            frog.clearObject()
+        })
+        goldFrogArr.forEach(frog => {
+            frog.clearObject()
+        })
+        frogArr.length = 0
+        goldFrogArr.length = 0
+    }, 100);
 }
 
 const createIntervalsLevelTwo = () => {
@@ -658,21 +667,22 @@ const clearAllIntervalsLevelTwo = () => {
     clearInterval(movingPlatformsInterval)
     clearInterval(makingGoldFrogsInterval)
     clearInterval(movingGoldFrogsInterval)
-    goldFrogInWaterArr.forEach(frog => {
-        frog.clearObject()
-    })
-    goldFrogInWaterArr.length = 0
-    platformArr.forEach(platform => {
-        platform.clearObject()
-    })
-    platformArr.length = 0
+    setTimeout(() => {
+        goldFrogInWaterArr.forEach(frog => {
+            frog.clearObject()
+        })
+        goldFrogInWaterArr.length = 0
+        platformArr.forEach(platform => {
+            platform.clearObject()
+        })
+        platformArr.length = 0
+    }, 100);
 }
 
 const createIntervalsLevelThree = () => {
     levelOne = false
     levelTwo = false
     levelThree = true
-
     makeTunnelInterval = setInterval(makeTunnel, 200)
     moveTunnelInterval = setInterval(moveTunnel, 2, tunnelArr, 1)
     makeOpeningInterval = setInterval(makeTunnelOpening, 30)
@@ -686,18 +696,20 @@ const clearAllIntervalsLevelThree = () => {
     clearInterval(makeOpeningInterval)
     clearInterval(moveOpeningInterval)
     clearInterval(moveGoldFrogsInterval)
-    tunnelArr.forEach(brick => {
-        brick.clearObject()
-    })
-    openingArr.forEach(opening => {
-        opening.clearObject()
-    })
-    goldFrogArr.forEach(frog => {
-        frog.clearObject()
-    })
-    tunnelArr.length = 0
-    openingArr.length = 0
-    goldFrogArr.length = 0
+    setTimeout(() => {
+        tunnelArr.forEach(brick => {
+            brick.clearObject()
+        })
+        openingArr.forEach(opening => {
+            opening.clearObject()
+        })
+        goldFrogArr.forEach(frog => {
+            frog.clearObject()
+        })
+        tunnelArr.length = 0
+        openingArr.length = 0
+        goldFrogArr.length = 0
+    }, 100);
 }
 const resetGame = () => {
     currentScore = 0
@@ -706,7 +718,16 @@ const resetGame = () => {
     if (levelOne) clearAllIntervalsLevelOne()
     if (levelTwo) clearAllIntervalsLevelTwo()
     if (levelThree) clearAllIntervalsLevelThree()
-    truck.createImage()
+    setTimeout(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+        ctxThree.clearRect(0, 0, canvas.width, canvas.height)
+        ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    }, 100)
+    levelOne = false
+    levelTwo = false
+    levelThree = false
+
 }
 
 

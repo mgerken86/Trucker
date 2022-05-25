@@ -163,6 +163,7 @@ function detectHit(obj1, obj2) {
         //using height of gold frogs to create conditions for them
         if (obj2.height === 50) {
             currentScore += 100
+            showScore()
             //remove specific truthy HitTest gold from from array so that it doesn't keep getting Interval to come down
             for (let i = 0; i < goldFrogArr.length; i++) {
                 if (goldFrogArr[i] === obj2) {
@@ -208,7 +209,7 @@ const drawTruck = () => {
 
 //assign direction arrow inputs to car => each left and right shifts over one lane
 const moveTruck = (e) => {
-    if ((levelOne) || (levelTwo) || (levelThree)) {
+    if (levelOne || levelTwo || levelThree) {
         //immediately clear out the 'old' truck
         truck.clearObject()
         switch (e.key) {
@@ -622,7 +623,6 @@ const changeThingsAsPointsIncrease = (currentScore) => {
             moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
         }
     }
-    showScore()
 }
 
 const createIntervalsLevelOne = () => {

@@ -201,13 +201,11 @@ function detectHit(obj1, obj2) {
             if (levelThree) {
                 // clearInterval(moveGoldFrogsInterval)
                 // moveGoldFrogsInterval = setInterval(moveTunnel, 40, goldFrogArr, 20)
-                goldFrogArr.forEach(frog => {
-                    frog.clearObject()
-                })
-                goldFrogArr.length = 0
+                
+                
                 setTimeout(() => {
                     obj2.clearObject()
-                    ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+                    // ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
                 }, 50)
             }
             showScore()
@@ -669,11 +667,12 @@ const createIntervalsLevelThree = () => {
     levelOne = false
     levelTwo = false
     levelThree = true
-    makeTunnelInterval = setInterval(makeTunnel, 150)
-    moveTunnelInterval = setInterval(moveTunnel, 50, tunnelArr, 20)
+    //good ratios for moving pretty quickly
+    makeTunnelInterval = setInterval(makeTunnel, 200)
+    moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
     makeOpeningInterval = setInterval(makeTunnelOpening, 30)
-    moveOpeningInterval = setInterval(moveTunnel, 40, openingArr, 20)
-    moveGoldFrogsInterval = setInterval(moveTunnel, 40, goldFrogArr, 20)
+    moveOpeningInterval = setInterval(moveTunnel, 4, openingArr,2)
+    moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
 }
 
 const clearAllIntervalsLevelThree = () => {

@@ -21,6 +21,7 @@ const startBtn = document.getElementById('start-btn'), waterButton = document.ge
 let goldFrogArr = []
 let goldFrogInWaterArr = []
 let frogArr = []
+let createdLaneDashesArr = []
 let platformArr = []
 let tunnelArr = []
 let openingArr = []
@@ -124,7 +125,7 @@ function detectHit(obj1, obj2) {
                 showScore()
                 if (lives === 0) {
                     alert('Game Over, you lose!!')
-                    resetGame()
+                    return resetGame()
                 }
                 obj2.clearObject()
                 if (levelOne) {
@@ -279,18 +280,11 @@ const makeLaneDashes = () => {
         laneDash9 = new Object(850, -50, ctxThree, 'yellow', 2, 50)
     ]
     laneDashesArr.forEach(dash => {
-        setInterval(() => {
-            dash.clearObject()
-            dash.y > 900 ? null : dash.y += 50
-            dash.renderObject()
-        }, 300)
+        createdLaneDashesArr.push(dash)
     })
 }
 
 const makeFrog = () => {
-    console.log(levelOne)
-    console.log(levelTwo)
-    console.log(levelThree)
     //possible lane array are the middles of all of the lanes
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
@@ -312,6 +306,7 @@ const makeGoldenFrog = () => {
 }
 
 const makeRain = (arr, distance) => {
+    changeThingsAsPointsIncrease()
     for (let i = 0; i < arr.length; i++) {
         detectHit(truck, arr[i])
         if (arr.length > 0) {
@@ -628,7 +623,6 @@ const createIntervalsLevelOne = () => {
     frogTimer2 = setInterval(makeGoldenFrog, 2000)
     frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
     goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
-    displayDashes = setInterval(makeLaneDashes, 900)
 }
 
 const clearAllIntervalsLevelOne = () => {
@@ -639,7 +633,6 @@ const clearAllIntervalsLevelOne = () => {
     clearInterval(frogTimer2)
     clearInterval(frogsRainingDown)
     clearInterval(goldFrogsRainingDown)
-    clearInterval(displayDashes)
     setTimeout(() => {
         frogArr.forEach(frog => {
             frog.clearObject()
@@ -715,15 +708,22 @@ const resetGame = () => {
     currentScore = 0
     lives = 3
     showScore()
-    if (levelOne) clearAllIntervalsLevelOne()
+
+    if (levelOne) {
+        clearAllIntervalsLevelOne()
+        clearInterval(displayDashes)
+        clearInterval(dashInterval)
+    }
     if (levelTwo) clearAllIntervalsLevelTwo()
     if (levelThree) clearAllIntervalsLevelThree()
+
     setTimeout(() => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
         ctxThree.clearRect(0, 0, canvas.width, canvas.height)
         ctxFour.clearRect(0, 0, canvas.width, canvas.height)
     }, 100)
+
     levelOne = false
     levelTwo = false
     levelThree = false
@@ -739,7 +739,8 @@ const resetGame = () => {
 // ************************************************************
 
 startBtn.addEventListener('click', (e) => {
-    score = 0
+    currentScore = 0
+    lives = 3
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
@@ -748,6 +749,15 @@ startBtn.addEventListener('click', (e) => {
     drawTruck()
     showScore()
     createIntervalsLevelOne()
+    displayDashes = setInterval(makeLaneDashes, 900)
+    dashInterval = setInterval(() => {
+        createdLaneDashesArr.forEach(dash => {
+            dash.clearObject()
+            dash.y > 900 ? null : dash.y += 5
+            dash.renderObject()
+            if (dash.y > 800) createdLaneDashesArr.shift()
+        })
+    }, 20)
 })
 
 waterButton.addEventListener('click', () => {
@@ -760,7 +770,6 @@ waterButton.addEventListener('click', () => {
     lives = 3
     showScore()
     drawTruck()
-    // clearInterval(displayDashes)
     makeWater()
     makeWaterLanes()
     createIntervalsLevelTwo()

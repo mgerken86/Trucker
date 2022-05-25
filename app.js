@@ -152,19 +152,20 @@ function detectHit(obj1, obj2) {
     if (hitTest) {
         if (obj2.width === 150 ||
             obj2.width === 200) {
+            //This is used to detect truck on platforms and in tunnel
             return true
         } else {
             showScore()
-            if (lives === 0) {
-                alert('Game Over, you lose!!')
-                resetGame()
-            }
             //using height of 'bad' frogs to make conditions for them, color of water, and height of tunnel bricks
             if (obj2.height === 80 ||
                 obj2.color === 'blue' ||
                 obj2.height === 100) {
                     //subtract a life for the baddies
                 lives--
+                if (lives === 0) {
+                    alert('Game Over, you lose!!')
+                    resetGame()
+                }
                 obj2.clearObject()
                 if (levelOne) {
                     //this is to give a reset so frogs don't immediately fly down and take another life
@@ -196,12 +197,13 @@ function detectHit(obj1, obj2) {
             for (let i = 0; i < goldFrogArr.length; i++) {
                 if (goldFrogArr[i] === obj2) {
                     goldFrogArr.splice(i, 1)
-                }
+                } 
             }
+            obj2.clearObject()
             if (levelOne) {
                 //remove touched goldFrog from array to keep it from re-rendering with the setInterval
                 // goldFrogArr.splice()
-                obj2.clearObject()
+                // obj2.clearObject()
                 if (currentScore === 2000) {
                     alert('YOU WIN!!!! On to the next Level!')
                     resetGame()
@@ -604,13 +606,14 @@ let i = 16
 let counter = 0
 
 const makeTunnelOpening = () => {
-    console.log(i)
+    // ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+    // console.log(i)
     // ***** AFTER SO MANY POINTS, MAKE TUNNEL OPENING SMALLER ********
     possibleXCoordinates = [0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250,
         275, 300, 325, 350, 375, 400, 425, 450, 475, 500,
         525, 550, 575, 600, 625, 650, 675, 700, 725, 750]
     tunnelX = possibleXCoordinates[i]
-    opening = new Object(tunnelX, -25, ctxTwo, 'darkgray', 150, 100)
+    opening = new Object(tunnelX, -25, ctxThree, 'darkgray', 150, 100)
     openingArr.push(opening)
 
     //if truck isn't inside any of the openings, detectHit() for tunnel bricks
@@ -631,14 +634,13 @@ const makeTunnelOpening = () => {
     } else {
         i += iIncrements[randomIndex]
     }
+    // **** THE CONDITION TO MAKE A GOLD FROG ********
     counter++
     if (counter === 50) {
-        goldFrog = new ImageArt(ctx, 'images/Gold-boy.png', tunnelX + 25, -25, 50, 50)
+        goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', tunnelX + 25, -25, 50, 50)
         goldFrogArr.push(goldFrog)
         return counter = 0
     }
-
-
     //this chooses how the x coordinates will change or stay the same the next time function is called
     return i
 }

@@ -421,10 +421,12 @@ const makeH1Dialogue = (objectType) => {
             y === 260 ||
             y === 460) {
             x = -50
+            src = 'images/dead-boy.png'
         } else {
             x = canvas.width + 50
+            src = 'images/dead-boy-reverse.png'
         }
-        platform = new ImageArt(ctxThree, 'images/dead-boy.png', x, y - 50, 150, 100)
+        platform = new ImageArt(ctxThree, src, x, y - 50, 150, 100)
         platformArr.push(platform)
     }
 

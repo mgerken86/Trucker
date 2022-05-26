@@ -1,9 +1,13 @@
-//Initially describe the storyline and rules. 
-//click button to begin game
+// ************************************************************
+
+// --------======== GLOBAL VARIABLES ========---------
+
+// ************************************************************
+
 //3 Sec Countdown timer until canvas starts 'moving'
-window.onload = (e) => {
-    makeLanes()
-}
+// window.onload = (e) => {
+//     makeLanes()
+// }
 
 //I use multiple canvases to prevent them from 'cutting' into each other when crossing over on same canvas and to adjust z-index
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
@@ -11,21 +15,37 @@ const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getC
 const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
+const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button')
+const h1 = document.querySelector('h1')
 
-const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button')
+//the empty arrays are where I put objects once I make them, and then run intervals on the whole array
 let goldFrogArr = []
 let goldFrogInWaterArr = []
 let frogArr = []
+let createdLaneDashesArr = []
 let platformArr = []
+let tunnelArr = []
+let openingArr = []
+let tunnelDashes = []
+
 let currentScore = 0
 let lives = 3
-let levelOne = true
+let levelOne = false
 let levelTwo = false
+let levelThree = false
 
 const showScore = () => {
     scoreboard.textContent = `SCORE: ${currentScore}      LIVES: ${lives}`
 }
 
+
+
+
+// ************************************************************
+
+// --------======== CLASSES FOR OBJECTS AND IMAGES ========---------
+
+// ************************************************************
 
 class Object {
     constructor(x, y, ctx, color, width, height) {
@@ -43,8 +63,209 @@ class Object {
     clearObject() {
         this.ctx.clearRect(this.x, this.y, this.width, this.height)
     }
-
 }
+
+class ImageArt {
+    constructor(ctx, src, x, y, width, height) {
+        this.ctx = ctx
+        this.src = src
+        this.x = x
+        this.y = y
+        this.width = width
+        this.height = height
+        this.img = new Image()
+    }
+    createImage() {
+
+        this.img.src = this.src
+        // this.img.onload = () => {
+        //     this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
+        // }
+        this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
+    }
+    clearObject() {
+        this.ctx.clearRect(this.x, this.y, this.width, this.height)
+
+    }
+}
+
+// ************************************************************
+
+// --------======== HIT TEST AND CONDITIONS FOR DIFFERENT HITS ========---------
+
+// ************************************************************
+function detectHit(obj1, obj2) {
+    let hitTest
+    // anything but a black object b/c that's the color of the tunnel openings for level 3
+    if (obj2.color !== 'black') {
+        hitTest =
+            obj1.y + obj1.height > obj2.y &&
+            obj1.y < obj2.y + obj2.height &&
+            obj1.x + obj1.width > obj2.x &&
+            obj1.x < obj2.x + obj2.width
+    } else {
+        // console.log('in the tunnel')
+        //this hitTest is more strict to make level 3 tunnel harder
+        hitTest =
+            obj1.y + obj1.height > obj2.y &&
+            obj1.y < obj2.y + obj2.height &&
+            obj1.x > obj2.x &&
+            obj1.x + obj1.width < obj2.x + obj2.width
+    }
+    if (hitTest) {
+        if (obj2.width === 150 ||
+            obj2.width === 200) {
+            //This is used to detect truck on platforms and in tunnel
+            return true
+        } else {
+            //using height of 'bad' frogs to make conditions for them, color of water, and height of tunnel bricks
+            if (obj2.height === 80 ||
+                obj2.color === 'blue' ||
+                obj2.height === 100) {
+                obj2.clearObject()
+
+                if (levelOne) {
+                    //this is to give a reset so frogs don't immediately fly down and take another life
+                    clearAllIntervalsLevelOne()
+                    
+                    obj2.clearObject()
+                    createIntervalsLevelOne()
+                    setTimeout(changeThingsAsPointsIncrease(currentScore), 500)
+                }
+                if (levelTwo) {
+                    clearAllIntervalsLevelTwo()
+                    obj2.clearObject()
+                    // createIntervalsLevelTwo()
+                    createIntervalsLevelTwo()
+                    //call this again b/c the water is cleared as it's the object that touches and kills truck
+                    makeWater()
+                }
+                if (levelThree) {
+                    //this resets tunnel so it doesn't repeatedly kill player
+                    clearAllIntervalsLevelThree()
+                    obj2.clearObject()
+                    createIntervalsLevelThree()
+                    setTimeout(() => {
+                        changeThingsAsPointsIncrease(currentScore)
+                    }, 500)
+
+                    //this is to start tunnel openings in middle of tunnel after player dies
+                }
+                lives--
+                showScore()
+                h1.innerText = `THAT'LL LEAVE A MARK!!`
+                setTimeout(() => h1.innerText = '', 1300)
+                drawTruck()
+                if (lives === 0) {
+                    alert('Game Over, you lose!!')
+                    return resetGame()
+                }
+                if (levelThree) {
+                    return i = 16
+                }
+            }
+        }
+        //using height of gold frogs to create conditions for them
+        if (obj2.height === 50) {
+            currentScore += 100
+            h1.innerText = `GOT 'EM!!`
+            setTimeout(() => h1.innerText = '', 900)
+            showScore()
+            //remove specific truthy HitTest gold from from array so that it doesn't keep getting Interval to come down
+            for (let i = 0; i < goldFrogArr.length; i++) {
+                if (goldFrogArr[i] === obj2) {
+                    goldFrogArr.splice(i, 1)
+                }
+            }
+            for (let i = 0; i < goldFrogInWaterArr.length; i++) {
+                if (goldFrogInWaterArr[i] === obj2) {
+                    // console.log(`This is the frog: ${goldFrogInWaterArr[i]} at index: ${i}}`)
+                    goldFrogInWaterArr.splice(i, 1)
+                }
+            }
+            setTimeout(() => {
+                obj2.clearObject()
+                // ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+            }, 50)
+            changeThingsAsPointsIncrease(currentScore)
+        }
+    }
+}
+
+
+
+// ************************************************************
+
+//    --------======== TRUCK INPUTS ========---------
+
+// ************************************************************
+
+
+let truck = new ImageArt(ctx, 'images/Truck.png', canvas.width / 2 - 25, canvas.height - 140, 50, 100)
+truck.createImage()
+
+// //to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
+// let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100, )
+// //made this as a function to setInterval on it to minimize the lane lines carving into the truck
+const drawTruck = () => {
+    truck.clearObject()
+    truck.x = canvas.width / 2 - 25
+    truck.y = canvas.height - 140
+    truck.createImage()
+}
+
+//assign direction arrow inputs to car => each left and right shifts over one lane
+const moveTruck = (e) => {
+    if (levelOne || levelTwo || levelThree) {
+        //immediately clear out the 'old' truck
+        truck.clearObject()
+        switch (e.key) {
+            case 'ArrowRight':
+                if (levelTwo || levelThree) {
+                    truck.x < 825 ? truck.x += 25 : null
+                } else {
+                    truck.x < 825 ? truck.x += 100 : null
+                }
+                break
+            case 'ArrowLeft':
+                if (levelTwo || levelThree) {
+                    truck.x > 25 ? truck.x -= 25 : null
+                } else {
+                    //chose 25 because that's the closest it gets to the left border
+                    truck.x > 25 ? truck.x -= 100 : null
+                }
+                break
+            case 'ArrowUp':
+                console.log(truck.y)
+                if (currentScore >= 3000) {
+                    truck.y > 0 ? truck.y -= 100 : null
+                    //How it's decided you win level 2
+                    if (truck.y < 10) {
+                        alert('YOU BEAT LEVEL 2!!!')
+                        resetGame()
+                    }
+                } else
+                    truck.y > 10 ? truck.y -= 100 : null
+
+                // truck.y > 450 ? truck.y -= 100 : null
+                break
+            case 'ArrowDown':
+                truck.y < canvas.height - 140 ? truck.y += 100 : null
+                break
+        }
+        //render truck with new coordinates
+        truck.createImage()
+    }
+}
+window.addEventListener('keydown', moveTruck)
+
+
+
+// ************************************************************
+
+//    --------======== STREET LEVEL ========---------
+
+// ************************************************************
 
 const makeLanes = () => {
     const lanes = [
@@ -76,100 +297,18 @@ const makeLaneDashes = () => {
         laneDash9 = new Object(850, -50, ctxThree, 'yellow', 2, 50)
     ]
     laneDashesArr.forEach(dash => {
-        setInterval(() => {
-            dash.clearObject()
-            dash.y > 900 ? null : dash.y += 50
-            dash.renderObject()
-        }, 300)
+        createdLaneDashesArr.push(dash)
     })
 }
 
-// *********** HIT TEST AND THE EFFECTS OF VARIOUS CONDITIONS AFTER A HIT ************
-function detectHit(obj1, obj2) {
-    let hitTest =
-        obj1.y + obj1.height > obj2.y &&
-        obj1.y < obj2.y + obj2.height &&
-        obj1.x + obj1.width > obj2.x &&
-        obj1.x < obj2.x + obj2.width
-    if (hitTest) {
-        if (obj2.color === 'purple') {
-            return true
-        } else {
-            if (obj2.color === 'green' ||
-                obj2.color === 'blue') {
-                obj2.clearObject()
-                if (levelOne) {
-                    //this is to give a quick reset so frogs don't immediately fly down and take another life
-                    clearAllIntervalsLevelOne()
-                    createIntervalsLevelOne()
-                }
-                if (levelTwo) {
-                    clearAllIntervalsLevelTwo()
-                    createIntervalsLevelTwo()
-                    //call this again b/c the water is cleared as it's the object that touches and kills truck
-                    makeWater()
-                }
-                lives--
-                drawTruck()
-                showScore()
-                if (lives === 0) {
-                    alert('Game Over, you lose!!')
-                    resetGame()
-                }
-            }
-        }
-        if (obj2.color === 'gold') {
-            currentScore += 100
-            if (levelOne) {
-                //remove touched goldFrog from array to keep it from re-rendering with the setInterval
-                goldFrogArr.shift()
-                obj2.clearObject()
-                if (currentScore === 2000) {
-                    alert('YOU WIN!!!! On to the next Level!')
-                    resetGame()
-                } else
-                    //these make frogs faster as their speed gets quicker to keep the number of obstacles a similar density
-                    if (currentScore >= 1500) {
-                        clearInterval(frogsRainingDown)
-                        frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
-                        clearInterval(frogTimer)
-                        frogTimer = setInterval(makeFrog, 100)
-                    } else
-                        if (currentScore >= 1000) {
-                            clearInterval(frogsRainingDown)
-                            frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
-                            clearInterval(frogTimer)
-                            frogTimer = setInterval(makeFrog, 150)
-                        } else
-                            if (currentScore >= 500) {
-                                clearInterval(frogsRainingDown)
-                                frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
-                                clearInterval(frogTimer)
-                                frogTimer = setInterval(makeFrog, 225)
-                            }
-            }
-            if (levelTwo) {
-                //this was the only way I could remove the specific gold frog
-                for (let i = 0; i < goldFrogInWaterArr.length; i++) {
-                    if (goldFrogInWaterArr[i] === obj2) {
-                        console.log(`This is the frog: ${goldFrogInWaterArr[i]} at index: ${i}}`)
-                        goldFrogInWaterArr.splice(i, 1)
-                    }
-                }
-                obj2.clearObject()
-            }
-            showScore()
-        }
-    }
-}
-
 const makeFrog = () => {
-
     //possible lane array are the middles of all of the lanes
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
-    //frog with random x axis
-    frog = new Object(possibleLaneArray[randomIndex] - 25, -100, ctx, 'green', 50, 40)
+    possibleImageSources = ['images/angry-boy.png', 'images/Agry-boy-2.png', 'images/Angry-boy-3.png']
+    src = possibleImageSources[Math.floor(Math.random() * possibleImageSources.length)]
+
+    frog = new ImageArt(ctx, src, possibleLaneArray[randomIndex] - 40, -100, 80, 80)
     //push frog object into array
     frogArr.push(frog)
 }
@@ -178,18 +317,19 @@ const makeGoldenFrog = () => {
     possibleLaneArray = [50, 150, 250, 350, 450, 550, 650, 750, 850]
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //put this one on ctx2 to be behind other frogs 
-    goldFrog = new Object(possibleLaneArray[randomIndex] - 15, -100, ctxTwo, 'gold', 30, 50)
+    goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', possibleLaneArray[randomIndex] - 25, -100, 50, 50)
     goldFrogArr.push(goldFrog)
     //each frog in array gets an interval to have it 'rain' down. 
 }
 
 const makeRain = (arr, distance) => {
+    changeThingsAsPointsIncrease()
     for (let i = 0; i < arr.length; i++) {
         detectHit(truck, arr[i])
         if (arr.length > 0) {
             arr[i].clearObject()
             arr[i].y += distance
-            arr[i].renderObject()
+            arr[i].createImage()
             //This boots frog out of array when they've gone off screen
             if (arr[i].y > 800) {
                 arr.shift()
@@ -198,121 +338,15 @@ const makeRain = (arr, distance) => {
     }
 }
 
-//to position truck in center of x axis, I divided the canvas in half and then subtracted half the truck's width
-let truck = new Object(canvas.width / 2 - 25, canvas.height - 140, ctx, 'red', 50, 100)
-//made this as a function to setInterval on it to minimize the lane lines carving into the truck
-const drawTruck = () => {
-    truck.clearObject()
-    truck.x = canvas.width / 2 - 25
-    truck.y = canvas.height - 140
-    truck.renderObject()
-}
 
 
-// ********* MOVING THE TRUCK WITH USER INPUTS ********************
-//assign direction arrow inputs to car => each left and right shifts over one lane
-const moveTruck = (e) => {
-    //immediately clear out the 'old' truck
-    truck.clearObject()
-    switch (e.key) {
-        case 'ArrowRight':
-            if (levelTwo) {
-                truck.x < 825 ? truck.x += 25 : null
-            } else {
-                truck.x < 825 ? truck.x += 100 : null
-            }
-            break
-        case 'ArrowLeft':
-            if (levelTwo) {
-                truck.x > 25 ? truck.x -= 25 : null
-            } else {
-                //chose 25 because that's the closest it gets to the left border
-                truck.x > 25 ? truck.x -= 100 : null
-            }
-            break
-        case 'ArrowUp':
-            console.log(truck.y)
-            if (currentScore >= 3000) {
-                truck.y > 0 ? truck.y -= 100 : null
-                //How it's decided you win level 2
-                if (truck.y < 10) {
-                    alert('YOU BEAT LEVEL 2!!!')
-                    resetGame()
-                }
-            } else
-                truck.y > 10 ? truck.y -= 100 : null
+// ************************************************************
 
-            // truck.y > 450 ? truck.y -= 100 : null
-            break
-        case 'ArrowDown':
-            truck.y < canvas.height - 140 ? truck.y += 100 : null
-            break
-    }
-    //render truck with new coordinates
-    truck.renderObject()
-}
-window.addEventListener('keydown', moveTruck)
+//    --------======== WATER LEVEL ========---------
+
+// ************************************************************
 
 
-// ******** BELOW ARE THE FUNCTIONS TO ADD/REMOVE INTERVALS AND TO RESET GAME *****
-const createIntervalsLevelOne = () => {
-    frogTimer = setInterval(makeFrog, 300)
-    frogTimer2 = setInterval(makeGoldenFrog, 2000)
-    frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
-    goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
-    displayDashes = setInterval(makeLaneDashes, 900)
-}
-
-const clearAllIntervalsLevelOne = () => {
-    clearInterval(frogTimer)
-    clearInterval(frogTimer2)
-    clearInterval(frogsRainingDown)
-    clearInterval(goldFrogsRainingDown)
-    clearInterval(displayDashes)
-    frogArr.forEach(frog => {
-        frog.clearObject()
-    })
-    goldFrogArr.forEach(frog => {
-        frog.clearObject()
-    })
-    frogArr.length = 0
-    goldFrogArr.length = 0
-
-}
-
-const createIntervalsLevelTwo = () => {
-    platformsInterval = setInterval(makePlatforms, 1000)
-    movingPlatformsInterval = setInterval(movePlatforms, 10, platformArr)
-    makingGoldFrogsInterval = setInterval(makeGoldFrogInWater, 1500)
-    movingGoldFrogsInterval = setInterval(moveGoldFrogsInWater, 10, goldFrogInWaterArr)
-}
-
-const clearAllIntervalsLevelTwo = () => {
-    clearInterval(platformsInterval)
-    clearInterval(movingPlatformsInterval)
-    clearInterval(makingGoldFrogsInterval)
-    clearInterval(movingGoldFrogsInterval)
-    goldFrogInWaterArr.forEach(frog => {
-        frog.clearObject()
-    })
-    goldFrogInWaterArr.length = 0
-    platformArr.forEach(platform => {
-        platform.clearObject()
-    })
-    platformArr.length = 0
-
-}
-const resetGame = () => {
-    currentScore = 0
-    lives = 3
-    showScore()
-    if (levelOne) clearAllIntervalsLevelOne()
-    if (levelTwo) clearAllIntervalsLevelTwo()
-    truck.renderObject()
-}
-
-
-// *************** WATER LEVEL ********************************
 const makeWater = () => {
     water = new Object(0, 0, ctxFour, 'blue', 920, 510)
     water.renderObject()
@@ -372,28 +406,34 @@ const makePlatforms = () => {
     } else {
         x = canvas.width + 50
     }
+    // possibleImageSources = ['']
 
-
-    platform = new Object(x, y - 50, ctxThree, 'purple', 150, 100)
+    platform = new ImageArt(ctxThree, 'images/dead-boy.png', x, y - 50, 150, 100)
     platformArr.push(platform)
-
 }
 
 const movePlatforms = (arr) => {
     showScore()
     distance = 1
-
+    if (currentScore === 500) {
+        h1.innerText = `CROSS THE GOLDEN LINE!!`
+        setTimeout(() => h1.innerText = '', 1300)
+    }
     if (currentScore >= 3000) {
         distance = 3
         finishLine = new Object(0, 0, ctxTwo, 'gold', canvas.width + 12, 13)
         finishLine.renderObject()
     } else
-        if (currentScore >= 2500) {
-            distance = 2
+        if (currentScore === 2500) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
         }
+    if (currentScore >= 2500) {
+        distance = 2
+    }
 
     arr.forEach(platform => {
-        platform.renderObject()
+        platform.createImage()
         if (arr.length > 0) {
             platform.clearObject()
             //this moves some platforms right, some platforms left
@@ -407,7 +447,7 @@ const movePlatforms = (arr) => {
                 }
             }
             moveObjectLeftOrRight(platform)
-            platform.renderObject()
+            platform.createImage()
             //this moves truck with platform
             //*****  BUG ALERT  ***** => TRUCK STOPS AT EDGES OF SCREEN BUT WON'T SLIDE IF SWITCHING PLATFORMS
             if (detectHit(truck, platform)) {
@@ -417,7 +457,7 @@ const movePlatforms = (arr) => {
                 } else {
                     truck.clearObject()
                     moveObjectLeftOrRight(truck)
-                    truck.renderObject()
+                    truck.createImage()
                 }
             }
         }
@@ -441,7 +481,8 @@ const makeGoldFrogInWater = () => {
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
     //x coordinates are opposite from platforms so they go in opposite directions
     x = (randomIndex % 2 === 1) ? -50 : canvas.width + 50
-    goldFrog = new Object(x, possibleLaneArray[randomIndex] - 15, ctxTwo, 'gold', 50, 30)
+    // goldFrog = new Object(x, possibleLaneArray[randomIndex] - 15, ctxTwo, 'gold', 50, 30)
+    goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', x, possibleLaneArray[randomIndex] - 15, 50, 50)
     goldFrogInWaterArr.push(goldFrog)
     if (goldFrogInWaterArr.length > 9) {
         goldFrogInWaterArr.shift()
@@ -450,7 +491,7 @@ const makeGoldFrogInWater = () => {
 const moveGoldFrogsInWater = (arr) => {
     distance = 2
     arr.forEach(frog => {
-        frog.renderObject()
+        frog.createImage()
         if (arr.length > 0) {
             frog.clearObject()
             //this moves some platforms right, some platforms left
@@ -464,55 +505,360 @@ const moveGoldFrogsInWater = (arr) => {
                 }
             }
             moveObjectLeftOrRight(frog)
-            frog.renderObject()
+            frog.createImage()
             //this will automatically add to score because of conditions if hitTest is true
             detectHit(truck, frog)
         }
     })
-    // arr = arr.filter(frog => {
-    //     return frog.x >= -50 && frog.x <= canvas.width + 50
-    // })
 }
 
 
-// ****** EVENT LISTENERS FOR BUTTONS *******
+// ************************************************************
 
-startBtn.addEventListener('click', (e) => {
-    score = 0
+//    --------======== TUNNEL LEVEL ========---------
+
+// ************************************************************
+
+const makeTunnel = () => {
+    tunnel = new ImageArt(ctxFour, 'images/bricks.png', 0, -100, canvas.width, 100)
+    tunnel.createImage()
+    tunnelArr.push(tunnel)
+}
+
+// i chooses the lane that the opening will be in. it starts in the middle and either stays the same for next opening or is one more or one less in coordinates array
+let i = 16
+//EUREKA!! when counter reaches (x), a gold frog will be made at same coordinates as opening and will have setInterval to come down at same speed
+let counter = 0
+
+const makeTunnelOpening = () => {
+    // console.log(i)
+    // ***** AFTER SO MANY POINTS, MAKE TUNNEL OPENING SMALLER ********
+    possibleXCoordinates = [0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250,
+        275, 300, 325, 350, 375, 400, 425, 450, 475, 500,
+        525, 550, 575, 600, 625, 650, 675, 700, 725, 750]
+    tunnelX = possibleXCoordinates[i]
+    opening = new Object(tunnelX, -25, ctxThree, 'black', 150, 100)
+    openingArr.push(opening)
+
+    //if truck isn't inside any of the openings, detectHit() for tunnel bricks
+    if (openingArr.every(opening => !detectHit(truck, opening))) {
+        tunnelArr.forEach(brick => {
+            detectHit(truck, brick)
+        })
+        //this keeps the opening from starting on an end if user loses a life and resets in middle  
+    }
+    //This makes i only stay the same or change by 1 to keep openings next to each other
+    iIncrements = [0, -1, 1]
+    randomIndex = Math.floor(Math.random() * iIncrements.length)
+    //these conditions keep openings from going off screen
+    if (tunnelX === 0) {
+        i += 1
+    } else if (tunnelX === 750) {
+        i -= 1
+    } else {
+        i += iIncrements[randomIndex]
+    }
+    // **** THE CONDITION TO MAKE A GOLD FROG ********
+    counter++
+    if (counter === 50) {
+        goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', tunnelX + 25, -25, 50, 50)
+        goldFrogArr.push(goldFrog)
+        return counter = 0
+    }
+    //this chooses how the x coordinates will change or stay the same the next time function is called
+    return i
+}
+
+
+const moveTunnel = (arr, distance) => {
+    arr.forEach(opening => {
+        opening.clearObject()
+        opening.y += distance
+        if (arr === goldFrogArr) {
+            detectHit(truck, opening)
+        }
+        //this makes the tunnel/frogs create Image or the openings render
+        arr === tunnelArr || arr === goldFrogArr ? opening.createImage() : opening.renderObject()
+        if (opening.y > 800) {
+            // clearInterval(moveTunnelInterval)
+            // arr.length = 0
+            arr.shift()
+        }
+    })
+}
+
+// ************************************************************
+
+//    --------======== INTERVALS AND RESETTING GAME ========---------
+
+// ************************************************************
+const changeThingsAsPointsIncrease = (currentScore) => {
+    if (levelOne) {
+        //remove touched goldFrog from array to keep it from re-rendering with the setInterval
+        // goldFrogArr.splice()
+        // obj2.clearObject()
+        if (currentScore === 2000) {
+            alert('YOU WIN!!!! On to the next Level!')
+            clearAllIntervalsLevelOne()
+            resetGame()
+        } 
+        if (currentScore === 1500) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
+        }
+        if (currentScore === 1000) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
+        }
+        if (currentScore === 500) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
+        }
+            //these make frogs faster as their speed gets quicker to keep the number of obstacles a similar density 
+        
+            if (currentScore >= 1500) {
+            clearInterval(frogsRainingDown)
+            frogsRainingDown = setInterval(makeRain, 1, frogArr, 4)
+            clearInterval(frogTimer)
+            frogTimer = setInterval(makeFrog, 100)
+        } else 
+
+        if (currentScore >= 1000) {
+            clearInterval(frogsRainingDown)
+            frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
+            clearInterval(frogTimer)
+            frogTimer = setInterval(makeFrog, 150)
+        } else
+            
+        if (currentScore >= 500) {
+            clearInterval(frogsRainingDown)
+            frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
+            clearInterval(frogTimer)
+            frogTimer = setInterval(makeFrog, 225)
+        }
+    }
+    if (levelTwo) {
+        //this was the only way I could remove the specific gold frog
+
+    }
+    if (levelThree) {
+        if (currentScore === 1000) {
+            h1.innerText = `Things are speeding up!!`
+            setTimeout(() => h1.innerText = '', 1300)
+        }
+        if (currentScore >= 1000) {
+            clearInterval(moveTunnelInterval)
+            clearInterval(moveOpeningInterval)
+            clearInterval(moveGoldFrogsInterval)
+            //good ratios for moving pretty quickly
+            moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
+            moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 2)
+            moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
+        }
+    }
+}
+
+const createIntervalsLevelOne = () => {
     levelOne = true
     levelTwo = false
+    levelThree = false
+    frogTimer = setInterval(makeFrog, 300)
+    frogTimer2 = setInterval(makeGoldenFrog, 2000)
+    frogsRainingDown = setInterval(makeRain, 1, frogArr, 1)
+    goldFrogsRainingDown = setInterval(makeRain, 1, goldFrogArr, 2)
+}
+
+const clearAllIntervalsLevelOne = () => {
+    levelOne = true
+    levelTwo = false
+    levelThree = false
+    clearInterval(frogTimer)
+    clearInterval(frogTimer2)
+    clearInterval(frogsRainingDown)
+    clearInterval(goldFrogsRainingDown)
+    // setTimeout(() => {
+        frogArr.forEach(frog => {
+            frog.clearObject()
+        })
+        goldFrogArr.forEach(frog => {
+            frog.clearObject()
+        })
+        frogArr.length = 0
+        goldFrogArr.length = 0
+    // }, 100);
+}
+
+const createIntervalsLevelTwo = () => {
+    levelOne = false
+    levelTwo = true
+    levelThree = false
+    platformsInterval = setInterval(makePlatforms, 1000)
+    movingPlatformsInterval = setInterval(movePlatforms, 10, platformArr)
+    makingGoldFrogsInterval = setInterval(makeGoldFrogInWater, 1500)
+    movingGoldFrogsInterval = setInterval(moveGoldFrogsInWater, 10, goldFrogInWaterArr)
+}
+
+const clearAllIntervalsLevelTwo = () => {
+    clearInterval(platformsInterval)
+    clearInterval(movingPlatformsInterval)
+    clearInterval(makingGoldFrogsInterval)
+    clearInterval(movingGoldFrogsInterval)
+    setTimeout(() => {
+        goldFrogInWaterArr.forEach(frog => {
+            frog.clearObject()
+        })
+        goldFrogInWaterArr.length = 0
+        platformArr.forEach(platform => {
+            platform.clearObject()
+        })
+        platformArr.length = 0
+    }, 100);
+}
+
+const createIntervalsLevelThree = () => {
+    levelOne = false
+    levelTwo = false
+    levelThree = true
+    makeTunnelInterval = setInterval(makeTunnel, 200)
+    moveTunnelInterval = setInterval(moveTunnel, 2, tunnelArr, 1)
+    makeOpeningInterval = setInterval(makeTunnelOpening, 30)
+    moveOpeningInterval = setInterval(moveTunnel, 2, openingArr, 1)
+    moveGoldFrogsInterval = setInterval(moveTunnel, 2, goldFrogArr, 1)
+}
+
+const clearAllIntervalsLevelThree = () => {
+    clearInterval(makeTunnelInterval)
+    clearInterval(moveTunnelInterval)
+    clearInterval(makeOpeningInterval)
+    clearInterval(moveOpeningInterval)
+    clearInterval(moveGoldFrogsInterval)
+    // setTimeout(() => {
+        tunnelArr.forEach(brick => {
+            brick.clearObject()
+        })
+        openingArr.forEach(opening => {
+            opening.clearObject()
+        })
+        goldFrogArr.forEach(frog => {
+            frog.clearObject()
+        })
+        tunnelArr.length = 0
+        openingArr.length = 0
+        goldFrogArr.length = 0
+    // }, 1);
+}
+
+const hideButtons = () => {
+    startBtn.classList.add('hide')
+    waterButton.classList.add('hide')
+    tunnelButton.classList.add('hide')
+    h1.innerText = ''
+}
+const showButtons = () => {
+    startBtn.className = ''
+    waterButton.className = ''
+    tunnelButton.className = ''
+    setTimeout(() => h1.innerText = 'TRUCKER: Smash the Frogs!', 1400)
+}
+
+const resetGame = () => {
+    currentScore = 0
+    lives = 3
+    showButtons()
+
+    if (levelOne) {
+        clearAllIntervalsLevelOne()
+        clearInterval(displayDashes)
+        clearInterval(dashInterval)
+    }
+    if (levelTwo) clearAllIntervalsLevelTwo()
+    if (levelThree) clearAllIntervalsLevelThree()
+
+    setTimeout(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+        ctxThree.clearRect(0, 0, canvas.width, canvas.height)
+        ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+        canvasFour.className = ''
+        scoreboard.textContent = ``
+        //have this here again because level 3 keeps erasing h1 text after GameOver
+        setTimeout(() => h1.innerText = 'TRUCKER: Smash the Frogs!', 1300)
+    }, 100)
+
+    levelOne = false
+    levelTwo = false
+    levelThree = false
+
+}
+
+
+
+// ************************************************************
+
+//    --------======== EVENT LISTENERS AND BUTTONS ========---------
+
+// ************************************************************
+
+startBtn.addEventListener('click', (e) => {
+    hideButtons()
+    h1.innerText = `SMASH GOLD FROGS TO REACH 2000 POINTS!!`
+    setTimeout(() => h1.innerText = '', 2500)
+    currentScore = 0
+    lives = 3
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    canvasFour.classList.add('levelOne')
     makeLanes()
     drawTruck()
     showScore()
     createIntervalsLevelOne()
+    displayDashes = setInterval(makeLaneDashes, 900)
+    dashInterval = setInterval(() => {
+        createdLaneDashesArr.forEach(dash => {
+            dash.clearObject()
+            dash.y > 900 ? null : dash.y += 5
+            dash.renderObject()
+            if (dash.y > 800) createdLaneDashesArr.shift()
+        })
+    }, 20)
 })
 
-
-
-
 waterButton.addEventListener('click', () => {
+    hideButtons()
+    h1.innerText = `SMASH GOLD FROGS UNTIL FINISH LINE APPEARS!!`
+    setTimeout(() => h1.innerText = '', 2500)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
     ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    canvasFour.classList.add('levelTwo')
     goldFrogArr.length = 0
-    levelOne = false
-    levelTwo = true
     currentScore = 2000
-    lives = 5
+    lives = 3
     showScore()
     drawTruck()
-    // clearInterval(displayDashes)
     makeWater()
     makeWaterLanes()
     createIntervalsLevelTwo()
 })
 
-
+tunnelButton.addEventListener('click', () => {
+    hideButtons()
+    h1.innerText = `SMASH GOLD FROGS TO REACH 6000 POINTS!!`
+    setTimeout(() => h1.innerText = '', 2500)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
+    ctxThree.clearRect(0, 0, canvas.width, canvas.height)
+    ctxFour.clearRect(0, 0, canvas.width, canvas.height)
+    canvasFour.classList.add('levelThree')
+    drawTruck()
+    lives = 3
+    showScore()
+    createIntervalsLevelThree()
+    return i = 16
+})
 
 //spawn frogs that come down from x axis and come across from y axis
 //use math.random() to choose x axis
@@ -531,4 +877,4 @@ waterButton.addEventListener('click', () => {
 //even more frogs are spawned to make it harder
 //beat the boss by driving up ramps to hit him
 //have a life bar? each hit takes 20% off life bar?
-//Trigger a winning Endgame popup with button to restart
+// Trigger a winning Endgame popup with button to restart

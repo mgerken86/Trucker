@@ -4,11 +4,6 @@
 
 // ************************************************************
 
-//3 Sec Countdown timer until canvas starts 'moving'
-// window.onload = (e) => {
-//     makeLanes()
-// }
-
 //I use multiple canvases to prevent them from 'cutting' into each other when crossing over on same canvas and to adjust z-index
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getContext('2d')
@@ -30,7 +25,7 @@ let tunnelDashes = []
 
 let currentScore = 0
 let lives = 3
-let goldFrogsLeftCount = 0
+let goldFrogsLeftCount = 20
 let levelOne = false
 let levelTwo = false
 let levelThree = false
@@ -77,16 +72,11 @@ class ImageArt {
         this.img = new Image()
     }
     createImage() {
-
         this.img.src = this.src
-        // this.img.onload = () => {
-        //     this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
-        // }
         this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
     }
     clearObject() {
         this.ctx.clearRect(this.x, this.y, this.width, this.height)
-
     }
 }
 
@@ -128,7 +118,6 @@ function detectHit(obj1, obj2) {
                 if (levelOne) {
                     //this is to give a reset so frogs don't immediately fly down and take another life
                     clearAllIntervalsLevelOne()
-                    
                     obj2.clearObject()
                     createIntervalsLevelOne()
                     setTimeout(changeThingsAsPointsIncrease(goldFrogsLeftCount), 500)
@@ -136,7 +125,6 @@ function detectHit(obj1, obj2) {
                 if (levelTwo) {
                     clearAllIntervalsLevelTwo()
                     obj2.clearObject()
-                    // createIntervalsLevelTwo()
                     createIntervalsLevelTwo()
                     //call this again b/c the water is cleared as it's the object that touches and kills truck
                     makeWater()
@@ -149,12 +137,11 @@ function detectHit(obj1, obj2) {
                     setTimeout(() => {
                         changeThingsAsPointsIncrease(goldFrogsLeftCount)
                     }, 500)
-
-                    //this is to start tunnel openings in middle of tunnel after player dies
                 }
                 lives--
                 showScore()
                 h1.innerText = `THAT'LL LEAVE A MARK!!`
+                //resets h1 back to blank
                 setTimeout(() => h1.innerText = '', 1300)
                 drawTruck()
                 if (lives === 0) {
@@ -162,11 +149,13 @@ function detectHit(obj1, obj2) {
                     return resetGame()
                 }
                 if (levelThree) {
+                     //this is to start tunnel openings in middle of tunnel after player dies
                     return i = 16
                 }
             }
         }
-        //using height of gold frogs to create conditions for them
+
+        // *********-----using height of gold frogs to create conditions for them-----**********
         if (obj2.height === 50) {
             currentScore += 100
             goldFrogsLeftCount--
@@ -218,6 +207,7 @@ const drawTruck = () => {
 
 //assign direction arrow inputs to car => each left and right shifts over one lane
 const moveTruck = (e) => {
+    //this only lets user move truck if game is running
     if (levelOne || levelTwo || levelThree) {
         //immediately clear out the 'old' truck
         truck.clearObject()
@@ -238,12 +228,14 @@ const moveTruck = (e) => {
                 }
                 break
             case 'ArrowUp':
-                console.log(truck.y)
-                if (goldFrogsLeftCount = 0) {
+                // console.log(truck.y)
+                //this lets truck go over the 'finish line' of lvl 2
+                if (goldFrogsLeftCount === 0) {
                     truck.y > 0 ? truck.y -= 100 : null
                     //How it's decided you win level 2
                     if (truck.y < 10) {
                         alert('YOU BEAT LEVEL 2!!!')
+                        clearAllIntervalsLevelTwo()
                         resetGame()
                     }
                 } else
@@ -368,11 +360,11 @@ const makeWaterLanes = () => {
     })
 }
 
+//This array and the booleans allow platforms to spawn more evenly. When a platform is chosen it gets pushed into other array and removed from original array. Once first array is empty then bools switch and other array is used
 const preventDoublesArray = []
 let usePreventDoubles = false
 let possiblePlatformCoordinates = [60, 160, 260, 360, 460]
 let usePossibleCoordinates = true
-
 
 const makePlatforms = () => {
     // console.log(usePossibleCoordinates)
@@ -385,8 +377,6 @@ const makePlatforms = () => {
         usePreventDoubles = false
     }
     //put the randomIndex in preventdoubles. Next time function is called that value goes back into to possibleCoordinates
-    // possiblePlatformCoordinates = [60, 160, 260, 360, 460]
-
     if (usePossibleCoordinates) {
         randomIndex = Math.floor(Math.random() * possiblePlatformCoordinates.length)
         y = possiblePlatformCoordinates[randomIndex]
@@ -399,8 +389,8 @@ const makePlatforms = () => {
             possiblePlatformCoordinates.push(y)
             preventDoublesArray.splice(randomIndex, 1)
         }
-    //cant use this anymore after moving around possiblePlatformCoordinates
     // x = (randomIndex % 2 === 0) ? -50 : canvas.width + 50
+    //this chooses whether platform spawns from left or right
     if (y === 60 ||
         y === 260 ||
         y === 460) {
@@ -408,8 +398,6 @@ const makePlatforms = () => {
     } else {
         x = canvas.width + 50
     }
-    // possibleImageSources = ['']
-
     platform = new ImageArt(ctxThree, 'images/dead-boy.png', x, y - 50, 150, 100)
     platformArr.push(platform)
 }
@@ -421,16 +409,16 @@ const movePlatforms = (arr) => {
         h1.innerText = `CROSS THE GOLDEN LINE!!`
         setTimeout(() => h1.innerText = '', 1300)
     }
-    if (currentScore >= 3000) {
+    if (goldFrogsLeftCount <= 0) {
         distance = 3
         finishLine = new Object(0, 0, ctxTwo, 'gold', canvas.width + 12, 13)
         finishLine.renderObject()
     } else
-        if (currentScore === 2500) {
+        if (goldFrogsLeftCount <= 5) {
             h1.innerText = `Things are speeding up!!`
             setTimeout(() => h1.innerText = '', 1300)
         }
-    if (currentScore >= 2500) {
+    if (goldFrogsLeftCount <= 5) {
         distance = 2
     }
 
@@ -451,7 +439,7 @@ const movePlatforms = (arr) => {
             moveObjectLeftOrRight(platform)
             platform.createImage()
             //this moves truck with platform
-            //*****  BUG ALERT  ***** => TRUCK STOPS AT EDGES OF SCREEN BUT WON'T SLIDE IF SWITCHING PLATFORMS
+            //*****  BUG ALERT  ***** => TRUCK STOPS AT EDGES OF SCREEN BUT WON'T SLIDE WITH NEW PLATFORM IF SWITCHING PLATFORMS
             if (detectHit(truck, platform)) {
                 //this keeps truck from going off screen
                 if (truck.x < 0 || truck.x > 850) {
@@ -476,14 +464,13 @@ const movePlatforms = (arr) => {
 const makeGoldFrogInWater = () => {
     possibleLaneArray = [60, 160, 260, 360, 460]
     //this keeps user from camping out at the bottom to rack up points
-    if (currentScore >= 2500) {
+    if (goldFrogsLeftCount <= 7) {
         possibleLaneArray.pop()
     }
 
     randomIndex = Math.floor(Math.random() * possibleLaneArray.length)
-    //x coordinates are opposite from platforms so they go in opposite directions
+    //x coordinates for gold frogs are opposite from platforms so they go in reverse directions
     x = (randomIndex % 2 === 1) ? -50 : canvas.width + 50
-    // goldFrog = new Object(x, possibleLaneArray[randomIndex] - 15, ctxTwo, 'gold', 50, 30)
     goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', x, possibleLaneArray[randomIndex] - 15, 50, 50)
     goldFrogInWaterArr.push(goldFrog)
     if (goldFrogInWaterArr.length > 9) {
@@ -529,7 +516,7 @@ const makeTunnel = () => {
 
 // i chooses the lane that the opening will be in. it starts in the middle and either stays the same for next opening or is one more or one less in coordinates array
 let i = 16
-//EUREKA!! when counter reaches (x), a gold frog will be made at same coordinates as opening and will have setInterval to come down at same speed
+//when counter reaches 50, a gold frog will be made at same coordinates as opening and will have setInterval to come down at same speed
 let counter = 0
 
 const makeTunnelOpening = () => {
@@ -546,8 +533,7 @@ const makeTunnelOpening = () => {
     if (openingArr.every(opening => !detectHit(truck, opening))) {
         tunnelArr.forEach(brick => {
             detectHit(truck, brick)
-        })
-        //this keeps the opening from starting on an end if user loses a life and resets in middle  
+        })  
     }
     //This makes i only stay the same or change by 1 to keep openings next to each other
     iIncrements = [0, -1, 1]
@@ -573,17 +559,16 @@ const makeTunnelOpening = () => {
 
 
 const moveTunnel = (arr, distance) => {
-    arr.forEach(opening => {
-        opening.clearObject()
-        opening.y += distance
+    arr.forEach(object => {
+        object.clearObject()
+        object.y += distance
+        //detect hit for gold frogs
         if (arr === goldFrogArr) {
-            detectHit(truck, opening)
+            detectHit(truck, object)
         }
         //this makes the tunnel/frogs create Image or the openings render
-        arr === tunnelArr || arr === goldFrogArr ? opening.createImage() : opening.renderObject()
-        if (opening.y > 800) {
-            // clearInterval(moveTunnelInterval)
-            // arr.length = 0
+        arr === tunnelArr || arr === goldFrogArr ? object.createImage() : object.renderObject()
+        if (object.y > 800) {
             arr.shift()
         }
     })
@@ -596,9 +581,6 @@ const moveTunnel = (arr, distance) => {
 // ************************************************************
 const changeThingsAsPointsIncrease = (currentScore) => {
     if (levelOne) {
-        //remove touched goldFrog from array to keep it from re-rendering with the setInterval
-        // goldFrogArr.splice()
-        // obj2.clearObject()
         if (goldFrogsLeftCount === 0) {
             alert('YOU WIN!!!! On to the next Level!')
             clearAllIntervalsLevelOne()
@@ -625,14 +607,14 @@ const changeThingsAsPointsIncrease = (currentScore) => {
             frogTimer = setInterval(makeFrog, 100)
         } else 
 
-        if (currentScore <= 10) {
+        if (goldFrogsLeftCount <= 10) {
             clearInterval(frogsRainingDown)
             frogsRainingDown = setInterval(makeRain, 1, frogArr, 3)
             clearInterval(frogTimer)
             frogTimer = setInterval(makeFrog, 150)
         } else
             
-        if (currentScore <= 15) {
+        if (goldFrogsLeftCount <= 15) {
             clearInterval(frogsRainingDown)
             frogsRainingDown = setInterval(makeRain, 1, frogArr, 2)
             clearInterval(frogTimer)
@@ -767,9 +749,11 @@ const resetGame = () => {
     currentScore = 0
     lives = 3
     showButtons()
+    goldFrogsLeftCount = 20
 
     if (levelOne) {
         clearAllIntervalsLevelOne()
+        //Clear the dashes here so that they still run for the whole duration of level 1
         clearInterval(displayDashes)
         clearInterval(dashInterval)
     }
@@ -790,6 +774,7 @@ const resetGame = () => {
     levelOne = false
     levelTwo = false
     levelThree = false
+
 }
 
 
@@ -806,7 +791,7 @@ startBtn.addEventListener('click', (e) => {
     setTimeout(() => h1.innerText = '', 2500)
     currentScore = 0
     lives = 3
-    goldFrogsLeftCount = 20
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
@@ -816,6 +801,7 @@ startBtn.addEventListener('click', (e) => {
     drawTruck()
     showScore()
     createIntervalsLevelOne()
+    //Create these two intervals here so that they don't get started and cleared each time a player gets hit
     displayDashes = setInterval(makeLaneDashes, 900)
     dashInterval = setInterval(() => {
         createdLaneDashesArr.forEach(dash => {
@@ -825,6 +811,7 @@ startBtn.addEventListener('click', (e) => {
             if (dash.y > 800) createdLaneDashesArr.shift()
         })
     }, 20)
+    return goldFrogsLeftCount = 20
 })
 
 waterButton.addEventListener('click', () => {

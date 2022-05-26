@@ -34,7 +34,7 @@ body {
 }
 
 h1 {
-    font-size: 130px;
+    font-size: 75px;
     position: fixed;
     top: 0px;
 }
@@ -44,7 +44,7 @@ h1 {
 
 button {
     padding: 20px 60px;
-    font-size: 30px;
+    font-size: 25px;
     font-weight: bold;
     color: black;
     background-color: #00ff00;
@@ -112,9 +112,11 @@ button.hide {
 
 #span-1 {
     color: #00ff00;
+    margin-right: 80px;
 }
 #span-2 {
     color: #ff0000;
+    margin-right: 80px;
 }
 #span-3 {
     color: #ffff1a;

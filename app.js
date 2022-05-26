@@ -650,7 +650,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
     if (levelThree) {
         if (goldFrogsLeftCount === 0) {
             alert('YOU WIN!!!! On to the next Level!')
-            clearAllIntervalsLevelThree
+            clearAllIntervalsLevelThree()
             resetGame()
         }
         if (goldFrogsLeftCount === 10) {

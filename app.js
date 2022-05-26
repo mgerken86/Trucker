@@ -100,12 +100,13 @@ function detectHit(obj1, obj2) {
             obj1.x < obj2.x + obj2.width
     } else {
         // console.log('in the tunnel')
-        //this hitTest is more strict to make level 3 tunnel harder
+        //this hitTest is more strict to make sure truck is within the width of the tunnel openings
         hitTest =
-            obj1.y + obj1.height > obj2.y &&
+            obj1.y > obj2.y &&
             obj1.y < obj2.y + obj2.height &&
-            obj1.x > obj2.x &&
-            obj1.x + obj1.width < obj2.x + obj2.width
+            //subtract 5 to account for unseen border around truck image
+            obj1.x > obj2.x - 5 &&
+            obj1.x + obj1.width < obj2.x + obj2.width + 5
     }
     if (hitTest) {
         if (obj2.width === 150 ||
@@ -239,17 +240,22 @@ const moveTruck = (e) => {
         truck.clearObject()
         switch (e.key) {
             case 'ArrowRight':
-                if (levelTwo || levelThree) {
+                if (levelTwo) {
                     truck.x < 825 ? truck.x += 25 : null
+                } else if (levelThree) {
+                    truck.x > 25 ? truck.x += 40 : null
                 } else {
                     truck.x < 825 ? truck.x += 100 : null
                 }
                 break
             case 'ArrowLeft':
-                if (levelTwo || levelThree) {
-                    truck.x > 25 ? truck.x -= 25 : null
-                } else {
+                if (levelTwo) {
                     //chose 25 because that's the closest it gets to the left border
+                    truck.x > 25 ? truck.x -= 25 : null
+                } else if (levelThree) {
+                    truck.x > 25 ? truck.x -= 40 : null
+                } else {
+                    //100 here to make sure truck changes 1 lane each time on lvl 1
                     truck.x > 25 ? truck.x -= 100 : null
                 }
                 break
@@ -653,10 +659,22 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
             clearAllIntervalsLevelThree
             return resetGame()
         }
-        if (goldFrogsLeftCount === 10) {
+        if (goldFrogsLeftCount === 15 || goldFrogsLeftCount === 5) {
             makeH1Dialogue('faster')
         }
-        if (goldFrogsLeftCount <= 10) {
+
+        if (goldFrogsLeftCount <= 5) {
+            clearInterval(moveTunnelInterval)
+            clearInterval(moveOpeningInterval)
+            clearInterval(moveGoldFrogsInterval)
+            //have to make tunnel faster at this speed to keep it together in one piece
+            clearInterval(makeTunnelInterval)
+            makeTunnelInterval = setInterval(makeTunnel, 75)
+            moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 3)
+            moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 3)
+            moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 3)
+        } else
+        if (goldFrogsLeftCount <= 15) {
             clearInterval(moveTunnelInterval)
             clearInterval(moveOpeningInterval)
             clearInterval(moveGoldFrogsInterval)
@@ -664,7 +682,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
             moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
             moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 2)
             moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
-        }
+        } 
     }
 }
 

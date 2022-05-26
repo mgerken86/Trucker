@@ -53,6 +53,8 @@ button {
     background-color: #00ff00;
     font-family: 'VT323', monospace, sans-serif;
     z-index: 10;
+    border-radius: 30px;
+    margin: 0 20px;
 }
 button:hover {
     background-color: #ff0000;
@@ -110,7 +112,7 @@ button.hide {
     height: 100%;
 }
 #scoreboard {
-    font-size: 40px;
+    font-size: 50px;
     bottom: 0;
     color: #00ff00;
 }

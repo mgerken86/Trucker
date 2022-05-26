@@ -779,7 +779,6 @@ const showButtons = () => {
 const resetGame = () => {
     currentScore = 0
     lives = 3
-    showButtons()
     goldFrogsLeftCount = 20
 
     if (levelOne) {
@@ -804,6 +803,7 @@ const resetGame = () => {
         setTimeout(() => {
             h1.innerText = 'TRUCKER: Smash the Frogs!'
             h1.style.color = '#00ff00'
+            showButtons()
         }, 1300)
     }, 100)
 

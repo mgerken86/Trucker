@@ -610,7 +610,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
             case 0:
                 alert('YOU WIN!!!! On to the next Level!')
                 clearAllIntervalsLevelOne()
-                resetGame()
+                return resetGame()
                 break
             case 15:
                 makeH1Dialogue('faster')
@@ -651,7 +651,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
         if (goldFrogsLeftCount === 0) {
             alert('YOU WIN!!!! On to the next Level!')
             clearAllIntervalsLevelThree
-            resetGame()
+            return resetGame()
         }
         if (goldFrogsLeftCount === 10) {
             makeH1Dialogue('faster')

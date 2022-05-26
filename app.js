@@ -96,6 +96,7 @@ class ImageArt {
 // ************************************************************
 function detectHit(obj1, obj2) {
     let hitTest
+    // anything but a black object b/c that's the color of the tunnel openings for level 3
     if (obj2.color !== 'black') {
         hitTest =
             obj1.y + obj1.height > obj2.y &&
@@ -126,6 +127,7 @@ function detectHit(obj1, obj2) {
                 if (levelOne) {
                     //this is to give a reset so frogs don't immediately fly down and take another life
                     clearAllIntervalsLevelOne()
+                    
                     obj2.clearObject()
                     createIntervalsLevelOne()
                     setTimeout(changeThingsAsPointsIncrease(currentScore), 500)
@@ -597,6 +599,7 @@ const changeThingsAsPointsIncrease = (currentScore) => {
         // obj2.clearObject()
         if (currentScore === 2000) {
             alert('YOU WIN!!!! On to the next Level!')
+            clearAllIntervalsLevelOne()
             resetGame()
         } 
         if (currentScore === 1500) {
@@ -673,7 +676,7 @@ const clearAllIntervalsLevelOne = () => {
     clearInterval(frogTimer2)
     clearInterval(frogsRainingDown)
     clearInterval(goldFrogsRainingDown)
-    setTimeout(() => {
+    // setTimeout(() => {
         frogArr.forEach(frog => {
             frog.clearObject()
         })
@@ -682,7 +685,7 @@ const clearAllIntervalsLevelOne = () => {
         })
         frogArr.length = 0
         goldFrogArr.length = 0
-    }, 100);
+    // }, 100);
 }
 
 const createIntervalsLevelTwo = () => {
@@ -729,7 +732,7 @@ const clearAllIntervalsLevelThree = () => {
     clearInterval(makeOpeningInterval)
     clearInterval(moveOpeningInterval)
     clearInterval(moveGoldFrogsInterval)
-    setTimeout(() => {
+    // setTimeout(() => {
         tunnelArr.forEach(brick => {
             brick.clearObject()
         })
@@ -742,7 +745,7 @@ const clearAllIntervalsLevelThree = () => {
         tunnelArr.length = 0
         openingArr.length = 0
         goldFrogArr.length = 0
-    }, 1);
+    // }, 1);
 }
 
 const hideButtons = () => {

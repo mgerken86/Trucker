@@ -12,6 +12,8 @@ const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.
 const scoreboard = document.getElementById('scoreboard')
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button')
 const h1 = document.querySelector('h1')
+const span1 = document.getElementById('span-1'), span2 = document.getElementById('span-2'), span3 = document.getElementById('span-3')
+const mainPageImg = document.getElementById('main-page-img')
 
 //the empty arrays are where I put objects once I make them, and then run intervals on the whole array
 let goldFrogArr = []
@@ -31,7 +33,9 @@ let levelTwo = false
 let levelThree = false
 
 const showScore = () => {
-    scoreboard.textContent = `SCORE: ${currentScore} LIVES: ${lives} GOLD FROGS LEFT: ${goldFrogsLeftCount}`
+    span1.textContent = `SCORE: ${currentScore}` 
+    span2.textContent = `LIVES: ${lives}` 
+    span3.textContent = `GOLD FROGS LEFT: ${goldFrogsLeftCount}`
 }
 
 
@@ -158,7 +162,7 @@ function detectHit(obj1, obj2) {
         // *********-----using height of gold frogs to create conditions for them-----**********
         if (obj2.height === 50) {
             currentScore += 100
-            goldFrogsLeftCount--
+            goldFrogsLeftCount > 0 ? goldFrogsLeftCount-- : null
             h1.innerText = `GOT 'EM!!`
             setTimeout(() => h1.innerText = '', 900)
             showScore()
@@ -736,12 +740,14 @@ const hideButtons = () => {
     startBtn.classList.add('hide')
     waterButton.classList.add('hide')
     tunnelButton.classList.add('hide')
+    mainPageImg.classList.add('hide')
     h1.innerText = ''
 }
 const showButtons = () => {
     startBtn.className = ''
     waterButton.className = ''
     tunnelButton.className = ''
+    mainPageImg.className = ''
     setTimeout(() => h1.innerText = 'TRUCKER: Smash the Frogs!', 1400)
 }
 
@@ -766,7 +772,9 @@ const resetGame = () => {
         ctxThree.clearRect(0, 0, canvas.width, canvas.height)
         ctxFour.clearRect(0, 0, canvas.width, canvas.height)
         canvasFour.className = ''
-        scoreboard.textContent = ``
+        span1.textContent = ''
+        span2.textContent = ''
+        span3.textContent = ''
         //have this here again because level 3 keeps erasing h1 text after GameOver
         setTimeout(() => h1.innerText = 'TRUCKER: Smash the Frogs!', 1300)
     }, 100)

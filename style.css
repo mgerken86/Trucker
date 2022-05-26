@@ -19,6 +19,9 @@ img {
   border: 5px solid #00ff00;
   border-radius: 80px;
 }
+img.hide {
+    display: none;
+}
 
 body {
     display: flex;
@@ -102,4 +105,17 @@ button.hide {
     font-size: 80px;
     bottom: 0;
     color: #00ff00;
+}
+/* #scoreboard span {
+    margin: 0px 20px;
+} */
+
+#span-1 {
+    color: #00ff00;
+}
+#span-2 {
+    color: #ff0000;
+}
+#span-3 {
+    color: #ffff1a;
 }

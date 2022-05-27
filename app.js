@@ -14,6 +14,7 @@ const startBtn = document.getElementById('start-btn'), waterButton = document.ge
 const h1 = document.querySelector('h1')
 const span1 = document.getElementById('span-1'), span2 = document.getElementById('span-2'), span3 = document.getElementById('span-3')
 const mainPageImg = document.getElementById('main-page-img')
+const gameOverScreen = document.getElementById('game-over-container'), playerWinsScreen = document.getElementById('player-wins-screen')
 
 //the empty arrays are where I put objects once I make them, and then run intervals on the whole array
 let goldFrogArr = []
@@ -38,8 +39,10 @@ const showScore = () => {
     span3.textContent = `GOLD FROGS LEFT: ${goldFrogsLeftCount}`
 }
 
-
-
+const showEndgameScreen = (outcome) => {
+    outcome.className = ''
+    setTimeout(() => outcome.classList.add('hide'), 1400)
+}
 
 // ************************************************************
 
@@ -148,7 +151,7 @@ function detectHit(obj1, obj2) {
                 makeH1Dialogue('baddie')
                 drawTruck()
                 if (lives === 0) {
-                    alert('Game Over, you lose!!')
+                    showEndgameScreen(gameOverScreen)
                     return resetGame()
                 }
                 if (levelThree) {
@@ -266,9 +269,9 @@ const moveTruck = (e) => {
                     truck.y > 0 ? truck.y -= 100 : null
                     //How it's decided you win level 2
                     if (truck.y < 10) {
-                        alert('YOU BEAT LEVEL 2!!!')
                         clearAllIntervalsLevelTwo()
                         resetGame()
+                        return showEndgameScreen(playerWinsScreen)
                     }
                 } else
                     truck.y > 10 ? truck.y -= 100 : null
@@ -616,7 +619,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
     if (levelOne) {
         switch (goldFrogsLeftCount) {
             case 0:
-                alert('YOU WIN!!!! On to the next Level!')
+                showEndgameScreen(playerWinsScreen)
                 clearAllIntervalsLevelOne()
                 return resetGame()
                 break
@@ -657,7 +660,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
     }
     if (levelThree) {
         if (goldFrogsLeftCount === 0) {
-            alert('YOU WIN!!!! On to the next Level!')
+            showEndgameScreen(playerWinsScreen)
             clearAllIntervalsLevelThree
             return resetGame()
         }
@@ -845,7 +848,7 @@ const resetGame = () => {
 
 startBtn.addEventListener('click', (e) => {
     hideButtons()
-    h1.innerText = `SMASH GOLD FROGS AND AVOID THE ANGRY ONES!!`
+    h1.innerText = `TRUCK GOLD FROGS AND AVOID THE ANGRY ONES!!`
     h1.style.color = '#00ff00'
     setTimeout(() => h1.innerText = '', 2500)
     currentScore = 0
@@ -875,7 +878,7 @@ startBtn.addEventListener('click', (e) => {
 
 waterButton.addEventListener('click', () => {
     hideButtons()
-    h1.innerText = `SMASH GOLD FROGS UNTIL FINISH LINE APPEARS!!`
+    h1.innerText = `TRUCK GOLD FROGS UNTIL FINISH LINE APPEARS!!`
     h1.style.color = '#00ff00'
     setTimeout(() => h1.innerText = '', 2500)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -896,7 +899,7 @@ waterButton.addEventListener('click', () => {
 
 tunnelButton.addEventListener('click', () => {
     hideButtons()
-    h1.innerText = `SMASH GOLD FROGS TO ESCAPE!!`
+    h1.innerText = `TRUCK THE GOLD FROGS TO ESCAPE!!`
     h1.style.color = '#00ff00'
     setTimeout(() => h1.innerText = '', 2500)
     ctx.clearRect(0, 0, canvas.width, canvas.height)

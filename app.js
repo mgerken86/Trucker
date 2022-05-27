@@ -540,7 +540,7 @@ const moveGoldFrogsInWater = (arr) => {
 // ************************************************************
 
 const makeTunnel = () => {
-    tunnel = new ImageArt(ctxFour, 'images/bricks.png', 0, -100, canvas.width, 100)
+    tunnel = new ImageArt(ctxFour, 'images/bricks.png', 0, -125, canvas.width, 100)
     tunnel.createImage()
     tunnelArr.push(tunnel)
 }
@@ -557,7 +557,9 @@ const makeTunnelOpening = () => {
         275, 300, 325, 350, 375, 400, 425, 450, 475, 500,
         525, 550, 575, 600, 625, 650, 675, 700, 725, 750]
     tunnelX = possibleXCoordinates[i]
-    opening = new Object(tunnelX, -25, ctxThree, 'black', 150, 100)
+    //make width 50 smaller when ten and under gold frogs left
+    width = goldFrogsLeftCount <= 10 ? 150 : 200
+    opening = new Object(tunnelX, -125, ctxThree, 'black', width, 100)
     openingArr.push(opening)
 
     //if truck isn't inside any of the openings, detectHit() for tunnel bricks
@@ -580,7 +582,7 @@ const makeTunnelOpening = () => {
     // **** THE CONDITION TO MAKE A GOLD FROG ********
     counter++
     if (counter === 50) {
-        goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', tunnelX + 25, -25, 50, 50)
+        goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', tunnelX + 35, -25, 50, 50)
         goldFrogArr.push(goldFrog)
         return counter = 0
     }

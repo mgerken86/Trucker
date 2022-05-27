@@ -1,5 +1,7 @@
 TRUCKER
 
+
+
 Premise =>
  You're driving to an interview for the job of your dreams. As you're envisioning how great you're going to be as the next Software Engineer at your favorite company, tragedy strikes! Your truck runs over a frog crossing the road.
 
@@ -19,12 +21,19 @@ As a user I want to =>
 
 .Level 3: Cross the flooded highway by using frogs as platforms
 
+
+
+
 Technologies Used =>
 
 HTML
 CSS
 Vanilla Javascript
 Canvas
+
+
+
+
 
 
 Logic and Obstacles =>

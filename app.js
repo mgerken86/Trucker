@@ -10,7 +10,7 @@ const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getC
 const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
-const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button')
+const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button'), rulesButton = document.getElementById('rules-btn')
 const h1 = document.querySelector('h1')
 const span1 = document.getElementById('span-1'), span2 = document.getElementById('span-2'), span3 = document.getElementById('span-3')
 const mainPageImg = document.getElementById('main-page-img')
@@ -780,6 +780,7 @@ const hideButtons = () => {
     startBtn.classList.add('hide')
     waterButton.classList.add('hide')
     tunnelButton.classList.add('hide')
+    rulesButton.classList.add('hide')
     mainPageImg.classList.add('hide')
     h1.innerText = ''
 }
@@ -787,9 +788,10 @@ const showButtons = () => {
     startBtn.className = ''
     waterButton.className = ''
     tunnelButton.className = ''
+    rulesButton.className = ''
     mainPageImg.className = ''
     setTimeout(() => {
-        h1.innerText = 'TRUCKER: Smash the Frogs!'
+        h1.innerText = 'T R U C K E R'
         h1.style.color = '#00ff00'
     }, 1400)
 }
@@ -819,7 +821,7 @@ const resetGame = () => {
         span3.textContent = ''
         //have this here again because level 3 keeps erasing h1 text after GameOver
         setTimeout(() => {
-            h1.innerText = 'TRUCKER: Smash the Frogs!'
+            h1.innerText = 'T R U C K ER'
             h1.style.color = '#00ff00'
             showButtons()
         }, 1300)

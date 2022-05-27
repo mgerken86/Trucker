@@ -5,18 +5,18 @@ html, body {
     font-family: 'VT323', monospace, sans-serif;
   }
 img {
-    position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    transform: translate(50%, 50%); 
-    margin-left: -150px;
+    position: absolute;
+    /* left: 0; */
+    /* top: 0; */
+    /* right: 0; */
+    /* bottom: 0; */
+    /* transform: translate(50%, 50%);  */
+    /* margin-left: -150px; */
     min-width: 50%;
   min-height: 50%;
   z-index: 1;
   padding: 30px;
-  border: 5px solid #00ff00;
+  border: 5px solid #ffff1a;
   border-radius: 80px;
 }
 img.hide {
@@ -25,6 +25,7 @@ img.hide {
 
 body {
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -39,7 +40,7 @@ header {
     z-index: 10;
 }
 h1 {
-    font-size: 75px;
+    font-size: 65px;
 }
 /* h1.hide {
     display: none
@@ -58,6 +59,7 @@ button {
 }
 button:hover {
     background-color: #ff0000;
+    color: #ffff1a;
     cursor: pointer;
 }
 

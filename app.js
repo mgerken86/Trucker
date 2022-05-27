@@ -41,7 +41,7 @@ const showScore = () => {
 
 const showEndgameScreen = (outcome) => {
     outcome.className = ''
-    setTimeout(() => outcome.classList.add('hide'), 1400)
+    setTimeout(() => outcome.classList.add('hide'), 2400)
 }
 
 // ************************************************************

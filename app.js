@@ -42,7 +42,8 @@ const stopAudio = (audio) => {
     audio.pause();
     audio.currentTime = 0;
 }
-window.addEventListener('mousemove', () => {
+//this was the best way to get the music to initially load on Title Screen
+window.addEventListener('click', () => {
     if (titleSongCounter === 0) {
         titleSong.play()
         titleSong.volume = .1

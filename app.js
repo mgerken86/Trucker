@@ -16,6 +16,43 @@ const span1 = document.getElementById('span-1'), span2 = document.getElementById
 const mainPageImg = document.getElementById('main-page-img')
 const gameOverScreen = document.getElementById('game-over-container'), playerWinsScreen = document.getElementById('player-wins-screen')
 
+//audio variables
+const truckSound = new Audio('audio/mixkit-explainer-video-game-alert-sweep-236.wav')
+const coinSound = new Audio('audio/mixkit-extra-bonus-in-a-video-game-2045.wav')
+const deadSound = new Audio('audio/mixkit-arcade-space-shooter-dead-notification-272.wav')
+const truckStartSound = new Audio('audio/mixkit-truck-start-engine-1623.wav')
+let titleSong = new Audio('audio/robo-cop-synthwave-100bpm-117s-12714.mp3')
+const levelOneSong = new Audio('audio/man-is-he-mega-glbml-22045.mp3')
+const levelTwoSong = new Audio('audio/mixkit-game-level-music-689.wav')
+const levelThreeSong = new Audio('audio/retrorace-108750.mp3')
+titleSong.loop = true
+titleSongCounter = 0
+// titleSong.muted = true
+levelOneSong.loop = true
+levelTwoSong.loop = true
+levelThreeSong.loop = true
+
+const playAudio = (src) => {
+    audio = new Audio(src)
+    audio.play()
+    audio.volume = .1
+}
+
+const stopAudio = (audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+}
+window.addEventListener('mousemove', () => {
+    if (titleSongCounter === 0) {
+        titleSong.play()
+        titleSong.volume = .1
+        return titleSongCounter++
+    }
+
+
+})
+
+
 //the empty arrays are where I put objects once I make them, and then run intervals on the whole array
 let goldFrogArr = []
 let goldFrogInWaterArr = []
@@ -147,11 +184,13 @@ function detectHit(obj1, obj2) {
                     }, 500)
                 }
                 lives--
+                playAudio('audio/mixkit-arcade-space-shooter-dead-notification-272.wav')
                 showScore()
                 makeH1Dialogue('baddie')
                 drawTruck()
                 if (lives === 0) {
                     showEndgameScreen(gameOverScreen)
+                    playAudio('audio/mixkit-player-losing-or-failing-2042.wav')
                     return resetGame()
                 }
                 if (levelThree) {
@@ -164,6 +203,7 @@ function detectHit(obj1, obj2) {
         // *********-----using height of gold frogs to create conditions for them-----**********
         if (obj2.height === 50) {
             currentScore += 100
+            playAudio('audio/mixkit-extra-bonus-in-a-video-game-2045.wav')
             goldFrogsLeftCount > 0 ? goldFrogsLeftCount-- : null
             makeH1Dialogue('goldBoy')
             showScore()
@@ -271,6 +311,7 @@ const moveTruck = (e) => {
                     if (truck.y < 10) {
                         clearAllIntervalsLevelTwo()
                         resetGame()
+                        playAudio('audio/mixkit-game-level-completed-2059.wav')
                         return showEndgameScreen(playerWinsScreen)
                     }
                 } else
@@ -283,6 +324,7 @@ const moveTruck = (e) => {
                 break
         }
         //render truck with new coordinates
+        playAudio("audio/mixkit-game-ball-tap-2073.wav")
         truck.createImage()
     }
 }
@@ -585,7 +627,7 @@ const makeTunnelOpening = () => {
     // **** THE CONDITION TO MAKE A GOLD FROG ********
     counter++
     if (counter === 50) {
-        goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', tunnelX + 35, -25, 50, 50)
+        goldFrog = new ImageArt(ctxTwo, 'images/Gold-boy.png', tunnelX + 45, -25, 50, 50)
         goldFrogArr.push(goldFrog)
         return counter = 0
     }
@@ -620,6 +662,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
         switch (goldFrogsLeftCount) {
             case 0:
                 showEndgameScreen(playerWinsScreen)
+                playAudio('audio/mixkit-game-level-completed-2059.wav')
                 clearAllIntervalsLevelOne()
                 return resetGame()
                 break
@@ -661,6 +704,7 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
     if (levelThree) {
         if (goldFrogsLeftCount === 0) {
             showEndgameScreen(playerWinsScreen)
+            playAudio('audio/mixkit-game-level-completed-2059.wav')
             clearAllIntervalsLevelThree
             return resetGame()
         }
@@ -679,15 +723,15 @@ const changeThingsAsPointsIncrease = (goldFrogsLeftCount) => {
             moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 3)
             moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 3)
         } else
-        if (goldFrogsLeftCount <= 15) {
-            clearInterval(moveTunnelInterval)
-            clearInterval(moveOpeningInterval)
-            clearInterval(moveGoldFrogsInterval)
-            //good ratios for moving pretty quickly
-            moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
-            moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 2)
-            moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
-        } 
+            if (goldFrogsLeftCount <= 15) {
+                clearInterval(moveTunnelInterval)
+                clearInterval(moveOpeningInterval)
+                clearInterval(moveGoldFrogsInterval)
+                //good ratios for moving pretty quickly
+                moveTunnelInterval = setInterval(moveTunnel, 4, tunnelArr, 2)
+                moveOpeningInterval = setInterval(moveTunnel, 4, openingArr, 2)
+                moveGoldFrogsInterval = setInterval(moveTunnel, 4, goldFrogArr, 2)
+            }
     }
 }
 
@@ -811,9 +855,16 @@ const resetGame = () => {
         //Clear the dashes here so that they still run for the whole duration of level 1
         clearInterval(displayDashes)
         clearInterval(dashInterval)
+        stopAudio(levelOneSong)
     }
-    if (levelTwo) clearAllIntervalsLevelTwo()
-    if (levelThree) clearAllIntervalsLevelThree()
+    if (levelTwo) {
+        clearAllIntervalsLevelTwo()
+        stopAudio(levelTwoSong)
+    }
+    if (levelThree) {
+        clearAllIntervalsLevelThree()
+        stopAudio(levelThreeSong)
+    }
 
     setTimeout(() => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -826,10 +877,14 @@ const resetGame = () => {
         span3.textContent = ''
         //have this here again because level 3 keeps erasing h1 text after GameOver
         setTimeout(() => {
-            h1.innerText = 'T R U C K ER'
+            h1.innerText = 'T R U C K E R'
             h1.style.color = '#00ff00'
             showButtons()
-        }, 1300)
+        }, 1800)
+        setTimeout(() => {
+            titleSong.play()
+            titleSong.volume = .1
+        }, 2500);
     }, 100)
 
     levelOne = false
@@ -847,13 +902,18 @@ const resetGame = () => {
 // ************************************************************
 
 startBtn.addEventListener('click', (e) => {
+    stopAudio(titleSong)
+    playAudio('audio/mixkit-truck-start-engine-1623.wav')
+    setTimeout(() => {
+        levelOneSong.play()
+        levelOneSong.volume = .1
+    }, 2000)
     hideButtons()
     h1.innerText = `TRUCK GOLD FROGS AND AVOID THE ANGRY ONES!!`
     h1.style.color = '#00ff00'
     setTimeout(() => h1.innerText = '', 2500)
     currentScore = 0
     lives = 3
-
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctxTwo.clearRect(0, 0, canvas.width, canvas.height)
     ctxThree.clearRect(0, 0, canvas.width, canvas.height)
@@ -877,6 +937,12 @@ startBtn.addEventListener('click', (e) => {
 })
 
 waterButton.addEventListener('click', () => {
+    stopAudio(titleSong)
+    playAudio('audio/mixkit-truck-start-engine-1623.wav')
+    setTimeout(() => {
+        levelTwoSong.play()
+        levelTwoSong.volume = .1
+    }, 2000)
     hideButtons()
     h1.innerText = `TRUCK GOLD FROGS UNTIL FINISH LINE APPEARS!!`
     h1.style.color = '#00ff00'
@@ -898,6 +964,12 @@ waterButton.addEventListener('click', () => {
 })
 
 tunnelButton.addEventListener('click', () => {
+    stopAudio(titleSong)
+    playAudio('audio/mixkit-truck-start-engine-1623.wav')
+    setTimeout(() => {
+        levelThreeSong.play()
+        levelThreeSong.volume = .3
+    }, 2000)
     hideButtons()
     h1.innerText = `TRUCK THE GOLD FROGS TO ESCAPE!!`
     h1.style.color = '#00ff00'

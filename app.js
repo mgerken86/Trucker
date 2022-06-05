@@ -11,6 +11,7 @@ const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasTh
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button'), rulesButton = document.getElementById('rules-btn')
+const canvasContainer = document.querySelector('.canvas-container')
 const h1 = document.querySelector('h1')
 const span1 = document.getElementById('span-1'), span2 = document.getElementById('span-2'), span3 = document.getElementById('span-3')
 const mainPageImg = document.getElementById('main-page-img')
@@ -832,6 +833,8 @@ const hideButtons = () => {
     tunnelButton.classList.add('hide')
     rulesButton.classList.add('hide')
     mainPageImg.classList.add('hide')
+    canvasContainer.classList.add('active')
+    scoreboard.classList.add('active')
     h1.innerText = ''
 }
 const showButtons = () => {
@@ -840,6 +843,8 @@ const showButtons = () => {
     tunnelButton.className = ''
     rulesButton.className = ''
     mainPageImg.className = ''
+    canvasContainer.classList.remove('active')
+    scoreboard.classList.remove('active')
     setTimeout(() => {
         h1.innerText = 'T R U C K E R'
         h1.style.color = '#00ff00'

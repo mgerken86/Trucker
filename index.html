@@ -16,27 +16,61 @@
 </head>
 
 <body scroll="no">
-        <img class="images" id="main-page-img" src="images/side-truck.png" alt="">
-        <header>
-            <h1>T R U C K E R</h1>
-            <div id="button-div">
-                <button id="start-btn">STREET LEVEL</button>
-                <button id="water-button">WATER LEVEL</button>
-                <button id="tunnel-button">TUNNEL LEVEL</button>
+    <!-- <img class="images" id="main-page-img" src="images/side-truck.png" alt=""> -->
+    <h1>T R U C K E R</h1>
+    <main>
+
+        <section class="levels-container">
+            <button id="start-btn">STREET LEVEL</button>
+            <div class="rules">
+                <p>Move using the ↑→↓← keys</p>
+                <p>Collect the <img src="images/Gold-boy.png" class="rules-character"> </p>
+                <p>Dodge the <img src="images/angry-boy.png" class="rules-character"><img src="images/Agry-boy-2.png"
+                        class="rules-character"><img src="images/Angry-boy-3.png" class="rules-character"></p>
+                <p>You beat the level when the Gold Frogs Left count gets to 0</p>
+                <p>But beware! Things speed up every 500 points!</p>
             </div>
-        </header>
-        <div class="canvas-container">
-            <canvas id="canvas" height=750 width=900></canvas>
-            <canvas id="canvas-two" height=750 width=900></canvas>
-            <canvas id="canvas-three" height=750 width=900></canvas>
-            <canvas id="canvas-four" height=750 width=900></canvas>
-        </div>
-        <div id="scoreboard">
-            <span id="span-1"></span>
-            <span id="span-2"></span>
-            <span id="span-3"></span>
-        </div>
-        <button id="rules-btn">RULES</button>
+            <img src="images/street-level.png" class="rules-img" alt="">
+        </section>
+
+        <section class="levels-container">
+            <button id="water-button">WATER LEVEL</button>
+            <div class="rules">
+                <p>Move using the ↑→↓← keys</p>
+                <p>Collect the <img src="images/Gold-boy.png" class="rules-character"> </p>
+                <p>Dodge the <img src="images/angry-boy.png" class="rules-character"><img src="images/Agry-boy-2.png"
+                        class="rules-character"><img src="images/Angry-boy-3.png" class="rules-character"></p>
+                <p>You beat the level when the Gold Frogs Left count gets to 0</p>
+                <p>But beware! Things speed up every 500 points!</p>
+            </div>
+            <img src="images/water-level.png" class="rules-img" alt="">
+        </section>
+
+        <section class="levels-container">
+            <button id="tunnel-button">TUNNEL LEVEL</button>
+            <div class="rules">
+                <p>Move using the ↑→↓← keys</p>
+                <p>Collect the <img src="images/Gold-boy.png" class="rules-character"> </p>
+                <p>Dodge the <img src="images/angry-boy.png" class="rules-character"><img src="images/Agry-boy-2.png"
+                        class="rules-character"><img src="images/Angry-boy-3.png" class="rules-character"></p>
+                <p>You beat the level when the Gold Frogs Left count gets to 0</p>
+                <p>But beware! Things speed up every 500 points!</p>
+            </div>
+            <img src="images/tunnel-level.png" class="rules-img" alt="">
+        </section>
+    </main>
+    <div class="canvas-container">
+        <canvas id="canvas" height=750 width=900></canvas>
+        <canvas id="canvas-two" height=750 width=900></canvas>
+        <canvas id="canvas-three" height=750 width=900></canvas>
+        <canvas id="canvas-four" height=750 width=900></canvas>
+    </div>
+    <div id="scoreboard">
+        <span id="span-1"></span>
+        <span id="span-2"></span>
+        <span id="span-3"></span>
+    </div>
+
 
 
 

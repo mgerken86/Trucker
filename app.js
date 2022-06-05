@@ -906,7 +906,7 @@ const resetGame = () => {
 // ************************************************************
 
 startBtn.addEventListener('click', (e) => {
-    stopAudio(titleSong)
+    setTimeout(() => stopAudio(titleSong), 200)
     playAudio('audio/mixkit-truck-start-engine-1623.wav')
     setTimeout(() => {
         levelOneSong.play()
@@ -941,7 +941,7 @@ startBtn.addEventListener('click', (e) => {
 })
 
 waterButton.addEventListener('click', () => {
-    stopAudio(titleSong)
+    setTimeout(() => stopAudio(titleSong), 200)
     playAudio('audio/mixkit-truck-start-engine-1623.wav')
     setTimeout(() => {
         levelTwoSong.play()
@@ -968,7 +968,7 @@ waterButton.addEventListener('click', () => {
 })
 
 tunnelButton.addEventListener('click', () => {
-    stopAudio(titleSong)
+    setTimeout(() => stopAudio(titleSong), 200)
     playAudio('audio/mixkit-truck-start-engine-1623.wav')
     setTimeout(() => {
         levelThreeSong.play()

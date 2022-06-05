@@ -18,13 +18,17 @@ body {
     z-index: 2;
 }
 
-main {
-    background-color: white;
+#main-container {
+    background-color: black;
     height: 80vh;
+    width: 95vw;
     display: flex;
     z-index: 10;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
+}
+#main-container.hide {
+    display: none;
 }
 
 section {
@@ -46,7 +50,7 @@ button {
     font-family: 'VT323', monospace, sans-serif;
     z-index: 10;
     border-radius: 30px;
-    margin: 0 20px;
+    margin: 0 20px 20px;
 }
 
 button:hover {
@@ -181,10 +185,10 @@ button:hover~.rules {
     display: flex;
     flex-direction: column;
     align-self: center;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    width: 30vw;
-    font-size: 1.5rem;
+    width: 28vw;
+    font-size: 2rem;
     height: 60vh;
 }
 button:hover ~ .rules-img {
@@ -192,11 +196,11 @@ button:hover ~ .rules-img {
 }
 
 .rules-img {
-    width: 30vw;
+    width: 28vw;
     height: 60vh;
     align-self: center;
 }
 
 .rules-character {
-    width: 2em;
+    width: 1em;
 }

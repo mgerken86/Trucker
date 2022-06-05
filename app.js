@@ -10,11 +10,11 @@ const canvasTwo = document.getElementById('canvas-two'), ctxTwo = canvasTwo.getC
 const canvasThree = document.getElementById('canvas-three'), ctxThree = canvasThree.getContext('2d')
 const canvasFour = document.getElementById('canvas-four'), ctxFour = canvasFour.getContext('2d')
 const scoreboard = document.getElementById('scoreboard')
+const mainContainer = document.getElementById('main-container')
 const startBtn = document.getElementById('start-btn'), waterButton = document.getElementById('water-button'), tunnelButton = document.getElementById('tunnel-button'), rulesButton = document.getElementById('rules-btn')
 const canvasContainer = document.querySelector('.canvas-container')
 const h1 = document.querySelector('h1')
 const span1 = document.getElementById('span-1'), span2 = document.getElementById('span-2'), span3 = document.getElementById('span-3')
-const mainPageImg = document.getElementById('main-page-img')
 const gameOverScreen = document.getElementById('game-over-container'), playerWinsScreen = document.getElementById('player-wins-screen')
 
 //audio variables
@@ -831,8 +831,7 @@ const hideButtons = () => {
     startBtn.classList.add('hide')
     waterButton.classList.add('hide')
     tunnelButton.classList.add('hide')
-    rulesButton.classList.add('hide')
-    mainPageImg.classList.add('hide')
+    mainContainer.classList.add('hide')
     canvasContainer.classList.add('active')
     scoreboard.classList.add('active')
     h1.innerText = ''
@@ -841,8 +840,7 @@ const showButtons = () => {
     startBtn.className = ''
     waterButton.className = ''
     tunnelButton.className = ''
-    rulesButton.className = ''
-    mainPageImg.className = ''
+    mainContainer.classList.remove('hide')
     canvasContainer.classList.remove('active')
     scoreboard.classList.remove('active')
     setTimeout(() => {

@@ -120,8 +120,10 @@ button.hide {
 }
 
 #scoreboard.active {
+    display: inline-block;
     font-size: 60px;
-    bottom: 0;
+    position: absolute;
+    bottom: .7em;
     color: #00ff00;
 }
 
